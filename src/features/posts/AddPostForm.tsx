@@ -1,4 +1,7 @@
 import { FormEvent } from 'react'
+import { useAppDispatch } from '../../app/hooks'
+import { Post, postAdded } from './postsSlice'
+import { nanoid } from '@reduxjs/toolkit'
 
 interface AddPostFormFields extends HTMLFormControlsCollection {
   postTitle: HTMLInputElement
@@ -9,6 +12,8 @@ interface AddPostFormElements extends HTMLFormElement {
 }
 
 export function AddPostForm() {
+  const dispatch = useAppDispatch()
+
   function handleSubmit(e: FormEvent<AddPostFormElements>) {
     e.preventDefault()
 
@@ -16,7 +21,13 @@ export function AddPostForm() {
     const title = elements.postTitle.value
     const content = elements.postContent.value
 
-    console.log('Values:', { title, content })
+    const newPost: Post = {
+      id: nanoid(),
+      title,
+      content,
+    }
+
+    dispatch(postAdded(newPost))
 
     e.currentTarget.reset()
   }
