@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
-import { PostAuthor } from './PostAuthor'
+import { PostMetaData } from './PostMetaData'
 
 export function SinglePostPage() {
   const { postId } = useParams()
@@ -18,7 +18,7 @@ export function SinglePostPage() {
     <section>
       <article className="post">
         <h2>{post.title}</h2>
-        <PostAuthor userId={post.authorUserId} />
+        <PostMetaData postId={postId} />
         <p className="post-content">{post.content}</p>
         <p>
           <Link to={`/editPost/${postId}`} className="button">

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
+import { PostMetaData } from './PostMetaData'
 import { Post } from './postsSlice'
-import { PostAuthor } from './PostAuthor'
 
 export function PostList() {
   const posts = useAppSelector((state) => state.posts)
@@ -25,7 +25,7 @@ function PostExcerpt({ post }: PostExcerptProps) {
       <h3>
         <Link to={`/posts/${post.id}`}>{post.title}</Link>
       </h3>
-      <PostAuthor userId={post.authorUserId} />
+      <PostMetaData postId={post.id} />
       <p>{post.content.substring(0, 100)}</p>
     </article>
   )

@@ -7,5 +7,5 @@ interface PostAuthorProps {
 export function PostAuthor({ userId }: PostAuthorProps) {
   const author = useAppSelector((state) => state.users.find((u) => u.id === userId))
 
-  return <p>by {author?.name ?? 'Unknown author'}</p>
+  return <span>by {author?.name ?? 'Unknown author'}</span>
 }

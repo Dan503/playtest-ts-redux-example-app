@@ -1,4 +1,5 @@
 import { PayloadAction, createSlice, nanoid } from '@reduxjs/toolkit'
+import { Duration, sub } from 'date-fns'
 
 // Define a TS type for the data we'll be using
 export interface Post {
@@ -6,11 +7,16 @@ export interface Post {
   title: string
   content: string
   authorUserId?: string
+  isoDate: string
+}
+
+function generateIsoDate(howLongAgo?: Duration) {
+  return sub(new Date(), howLongAgo || {}).toISOString()
 }
 
 const initialState: Array<Post> = [
-  { id: '1', title: 'First Post!', content: 'Hello!' },
-  { id: '2', title: 'Second Post', content: 'More text' },
+  { id: '1', title: 'First Post!', content: 'Hello!', isoDate: generateIsoDate({ minutes: 10 }) },
+  { id: '2', title: 'Second Post', content: 'More text', isoDate: generateIsoDate({ minutes: 5 }) },
 ]
 
 const postSlice = createSlice({
@@ -31,6 +37,7 @@ const postSlice = createSlice({
           title,
           content,
           authorUserId,
+          isoDate: generateIsoDate(),
         } satisfies Post,
       }),
     },
