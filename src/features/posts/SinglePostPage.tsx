@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
 
 export function SinglePostPage() {
@@ -18,6 +18,11 @@ export function SinglePostPage() {
       <article className="post">
         <h2>{post.title}</h2>
         <p className="post-content">{post.content}</p>
+        <p>
+          <Link to={`/editPost/${postId}`} className="button">
+            Edit
+          </Link>
+        </p>
       </article>
     </section>
   )
