@@ -5,11 +5,12 @@ import { Post } from './postsSlice'
 
 export function PostList() {
   const posts = useAppSelector((state) => state.posts)
+  const sortedPosts = posts.slice().sort((a, b) => b.isoDate.localeCompare(a.isoDate))
 
   return (
     <section className="posts-list">
       <h2>Posts</h2>
-      {posts.map((post) => (
+      {sortedPosts.map((post) => (
         <PostExcerpt post={post} key={post.id} />
       ))}
     </section>
