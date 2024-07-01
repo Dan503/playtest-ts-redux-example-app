@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
 import { Post } from './postsSlice'
 
@@ -20,7 +21,9 @@ interface PostExcerptProps {
 function PostExcerpt({ post }: PostExcerptProps) {
   return (
     <article className="post-excerpt">
-      <h3>{post.title}</h3>
+      <h3>
+        <Link to={`/posts/${post.id}`}>{post.title}</Link>
+      </h3>
       <p>{post.content.substring(0, 100)}</p>
     </article>
   )
