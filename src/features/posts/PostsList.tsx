@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
 import { PostMetaData } from './PostMetaData'
 import { Post } from './postsSlice'
+import { ReactionButtons } from './ReactionButtons'
 
 export function PostList() {
   const posts = useAppSelector((state) => state.posts)
@@ -28,6 +29,7 @@ function PostExcerpt({ post }: PostExcerptProps) {
       </h3>
       <PostMetaData postId={post.id} />
       <p>{post.content.substring(0, 100)}</p>
+      <ReactionButtons post={post} />
     </article>
   )
 }

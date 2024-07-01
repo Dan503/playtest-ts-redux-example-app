@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
 import { PostMetaData } from './PostMetaData'
+import { ReactionButtons } from './ReactionButtons'
 
 export function SinglePostPage() {
   const { postId } = useParams()
@@ -25,6 +26,7 @@ export function SinglePostPage() {
             Edit
           </Link>
         </p>
+        <ReactionButtons post={post} />
       </article>
     </section>
   )

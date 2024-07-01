@@ -2,21 +2,52 @@ import { PayloadAction, createSlice, nanoid } from '@reduxjs/toolkit'
 import { Duration, sub } from 'date-fns'
 
 // Define a TS type for the data we'll be using
+export interface Reactions {
+  thumbsUp: number
+  tada: number
+  heart: number
+  rocket: number
+  eyes: number
+}
+
+export type ReactionName = keyof Reactions
+
 export interface Post {
   id: string
   title: string
   content: string
   authorUserId?: string
   isoDate: string
+  reactions: Reactions
 }
 
 function generateIsoDate(howLongAgo?: Duration) {
   return sub(new Date(), howLongAgo || {}).toISOString()
 }
 
+const initialReactions: Reactions = {
+  thumbsUp: 0,
+  tada: 0,
+  heart: 0,
+  rocket: 0,
+  eyes: 0,
+}
+
 const initialState: Array<Post> = [
-  { id: '1', title: 'First Post!', content: 'Hello!', isoDate: generateIsoDate({ minutes: 10 }) },
-  { id: '2', title: 'Second Post', content: 'More text', isoDate: generateIsoDate({ minutes: 5 }) },
+  {
+    id: '1',
+    title: 'First Post!',
+    content: 'Hello!',
+    isoDate: generateIsoDate({ minutes: 10 }),
+    reactions: initialReactions,
+  },
+  {
+    id: '2',
+    title: 'Second Post',
+    content: 'More text',
+    isoDate: generateIsoDate({ minutes: 5 }),
+    reactions: initialReactions,
+  },
 ]
 
 const postSlice = createSlice({
@@ -38,6 +69,7 @@ const postSlice = createSlice({
           content,
           authorUserId,
           isoDate: generateIsoDate(),
+          reactions: initialReactions,
         } satisfies Post,
       }),
     },
@@ -50,11 +82,18 @@ const postSlice = createSlice({
         postToUpdate.authorUserId = authorUserId
       }
     },
+    reactionAdded(state, action: PayloadAction<{ postId: string; reaction: ReactionName }>) {
+      const { postId, reaction } = action.payload
+      const existingPost = state.find((post) => post.id === postId)
+      if (existingPost) {
+        existingPost.reactions[reaction]++
+      }
+    },
   },
 })
 
 // Export the auto-generated action creator with the same name
-export const { postAdded, postUpdated } = postSlice.actions
+export const { postAdded, postUpdated, reactionAdded } = postSlice.actions
 
 // Export the generated reducer function
 export const postReducer = postSlice.reducer
