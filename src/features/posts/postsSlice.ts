@@ -5,6 +5,7 @@ export interface Post {
   id: string
   title: string
   content: string
+  authorUserId?: string
 }
 
 const initialState: Array<Post> = [
@@ -24,20 +25,22 @@ const postSlice = createSlice({
         // safe to do here because `createSlice` uses Immer inside.
         state.push(action.payload)
       },
-      prepare: (title: string, content: string) => ({
+      prepare: (title: string, content: string, authorUserId: string) => ({
         payload: {
           id: nanoid(),
           title,
           content,
+          authorUserId,
         } satisfies Post,
       }),
     },
     postUpdated(state, action: PayloadAction<Post>) {
-      const { id, title, content } = action.payload
+      const { id, title, content, authorUserId } = action.payload
       const postToUpdate = state.find((item) => item.id === id)
       if (postToUpdate) {
         postToUpdate.title = title
         postToUpdate.content = content
+        postToUpdate.authorUserId = authorUserId
       }
     },
   },

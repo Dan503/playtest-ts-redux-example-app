@@ -1,11 +1,11 @@
 import { FormEvent } from 'react'
-import { useAppDispatch } from '../../app/hooks'
-import { Post, postAdded } from './postsSlice'
-import { nanoid } from '@reduxjs/toolkit'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { postAdded } from './postsSlice'
 
 interface AddPostFormFields extends HTMLFormControlsCollection {
   postTitle: HTMLInputElement
   postContent: HTMLTextAreaElement
+  postAuthor: HTMLSelectElement
 }
 interface AddPostFormElements extends HTMLFormElement {
   readonly elements: AddPostFormFields
@@ -13,6 +13,7 @@ interface AddPostFormElements extends HTMLFormElement {
 
 export function AddPostForm() {
   const dispatch = useAppDispatch()
+  const users = useAppSelector((state) => state.users)
 
   function handleSubmit(e: FormEvent<AddPostFormElements>) {
     e.preventDefault()
@@ -20,8 +21,9 @@ export function AddPostForm() {
     const { elements } = e.currentTarget
     const title = elements.postTitle.value
     const content = elements.postContent.value
+    const userId = elements.postAuthor.value
 
-    dispatch(postAdded(title, content))
+    dispatch(postAdded(title, content, userId))
 
     e.currentTarget.reset()
   }
@@ -35,6 +37,16 @@ export function AddPostForm() {
 
         <label htmlFor="postContent">Content</label>
         <textarea id="postContent" name="postContent" defaultValue="" required />
+
+        <label htmlFor="postAuthor">User</label>
+        <select id="postAuthor" required>
+          <option value="">-- Please select an Author --</option>
+          {users.map((u) => (
+            <option value={u.id} key={u.id}>
+              {u.name}
+            </option>
+          ))}
+        </select>
 
         <button type="submit">Save post</button>
       </form>
