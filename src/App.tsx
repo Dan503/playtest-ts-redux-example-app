@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 import { Navbar } from './components/Navbar'
+import { PostList } from './features/posts/PostsList'
 
 function App() {
   return (
@@ -8,14 +9,7 @@ function App() {
       <Navbar />
       <div className="App">
         <Routes>
-          <Route
-            path="/"
-            element={
-              <section>
-                <h2>Welcome to the Redux Essentials example app!</h2>
-              </section>
-            }
-          ></Route>
+          <Route path="/" element={<PostList />}></Route>
         </Routes>
       </div>
     </Router>
