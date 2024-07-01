@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 import { Navbar } from './components/Navbar'
 import { PostList } from './features/posts/PostsList'
+import { AddPostForm } from './features/posts/AddPostForm'
 
 function App() {
   return (
@@ -9,7 +10,15 @@ function App() {
       <Navbar />
       <div className="App">
         <Routes>
-          <Route path="/" element={<PostList />}></Route>
+          <Route
+            path="/"
+            element={
+              <>
+                <AddPostForm />
+                <PostList />
+              </>
+            }
+          ></Route>
         </Routes>
       </div>
     </Router>
