@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice, nanoid } from '@reduxjs/toolkit'
 import { Duration, sub } from 'date-fns'
+import { userLoggedOut } from '../auth/authSlice'
 
 // Define a TS type for the data we'll be using
 export interface Reactions {
@@ -89,6 +90,13 @@ const postSlice = createSlice({
         existingPost.reactions[reaction]++
       }
     },
+  },
+  extraReducers(builder) {
+    // Pass the userLoggedOut action creator to `builder.addCase()`
+    builder.addCase(userLoggedOut, (_state) => {
+      // Clear out the list of posts whenever the user logs out
+      return initialState
+    })
   },
 })
 
