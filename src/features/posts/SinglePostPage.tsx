@@ -5,6 +5,7 @@ import { ReactionButtons } from './ReactionButtons'
 
 export function SinglePostPage() {
   const { postId } = useParams()
+  const currentUserId = useAppSelector((state) => state.auth.currentUserId)
   const post = useAppSelector((state) => state.posts.find((post) => post.id === postId))
 
   if (!post) {
@@ -15,17 +16,21 @@ export function SinglePostPage() {
     )
   }
 
+  const canEdit = currentUserId === post.authorUserId
+
   return (
     <section>
       <article className="post">
         <h2>{post.title}</h2>
         <PostMetaData postId={postId} />
         <p className="post-content">{post.content}</p>
-        <p>
-          <Link to={`/editPost/${postId}`} className="button">
-            Edit
-          </Link>
-        </p>
+        {canEdit && (
+          <p>
+            <Link to={`/editPost/${postId}`} className="button">
+              Edit
+            </Link>
+          </p>
+        )}
         <ReactionButtons post={post} />
       </article>
     </section>

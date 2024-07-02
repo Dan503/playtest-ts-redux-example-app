@@ -13,7 +13,7 @@ interface AddPostFormElements extends HTMLFormElement {
 
 export function AddPostForm() {
   const dispatch = useAppDispatch()
-  const users = useAppSelector((state) => state.users)
+  const userId = useAppSelector((state) => state.auth.currentUserId) as string
 
   function handleSubmit(e: FormEvent<AddPostFormElements>) {
     e.preventDefault()
@@ -21,7 +21,6 @@ export function AddPostForm() {
     const { elements } = e.currentTarget
     const title = elements.postTitle.value
     const content = elements.postContent.value
-    const userId = elements.postAuthor.value
 
     dispatch(postAdded(title, content, userId))
 
@@ -37,16 +36,6 @@ export function AddPostForm() {
 
         <label htmlFor="postContent">Content</label>
         <textarea id="postContent" name="postContent" defaultValue="" required />
-
-        <label htmlFor="postAuthor">User</label>
-        <select id="postAuthor" required>
-          <option value="">-- Please select an Author --</option>
-          {users.map((u) => (
-            <option value={u.id} key={u.id}>
-              {u.name}
-            </option>
-          ))}
-        </select>
 
         <button type="submit">Save post</button>
       </form>
