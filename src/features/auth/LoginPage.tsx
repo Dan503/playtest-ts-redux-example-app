@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { FormEvent } from 'react'
-import { userLoggedIn } from './authSlice'
+import { login } from './authSlice'
 import { selectAllUsers } from '../users/usersSlice'
-import { Spinner } from '../../components/Spinner'
 
 interface LoginPageFormFields extends HTMLFormControlsCollection {
   userId: HTMLSelectElement
@@ -18,12 +17,11 @@ export function LoginPage() {
   const userStatus = useAppSelector((state) => state.users.status)
   const navigate = useNavigate()
 
-  function handleSubmit(e: FormEvent<LoginPageFormElements>) {
+  async function handleSubmit(e: FormEvent<LoginPageFormElements>) {
     e.preventDefault()
 
-    console.log(e.currentTarget.elements)
     const targetUserId = e.currentTarget.elements.userId.value
-    dispatch(userLoggedIn(targetUserId))
+    await dispatch(login(targetUserId))
     navigate('/posts')
   }
 

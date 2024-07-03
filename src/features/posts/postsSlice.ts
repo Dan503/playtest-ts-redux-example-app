@@ -3,7 +3,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { LoadingState } from '../../api/api.types'
 import { client } from '../../api/client'
 import { AppRootState } from '../../app/store'
-import { userLoggedOut } from '../auth/authSlice'
+import { logout } from '../auth/authSlice'
 
 // Define a TS type for the data we'll be using
 export interface Reactions {
@@ -87,9 +87,8 @@ const postSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    // Pass the userLoggedOut action creator to `builder.addCase()`
     builder
-      .addCase(userLoggedOut, (_state) => {
+      .addCase(logout.fulfilled, (_state) => {
         // Clear out the list of posts whenever the user logs out
         return initialState
       })
