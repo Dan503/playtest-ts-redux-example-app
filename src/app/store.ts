@@ -18,3 +18,5 @@ export type AppStore = typeof store
 export type AppDispatch = typeof store.dispatch
 // Infer the `AppRootState` type from the store itself
 export type AppRootState = ReturnType<typeof store.getState>
+// Export a reusable type for handwritten thunks
+export type AppThunk = ThunkAction<void, AppRootState, unknown, Action>
