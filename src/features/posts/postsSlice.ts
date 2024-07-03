@@ -23,6 +23,8 @@ export interface Post {
   reactions: Reactions
 }
 
+type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
+
 function generateIsoDate(howLongAgo?: Duration) {
   return sub(new Date(), howLongAgo || {}).toISOString()
 }
@@ -75,13 +77,12 @@ const postSlice = createSlice({
         } satisfies Post,
       }),
     },
-    postUpdated(state, action: PayloadAction<Post>) {
-      const { id, title, content, authorUserId } = action.payload
+    postUpdated(state, action: PayloadAction<PostUpdate>) {
+      const { title, content, id } = action.payload
       const postToUpdate = state.find((item) => item.id === id)
       if (postToUpdate) {
         postToUpdate.title = title
         postToUpdate.content = content
-        postToUpdate.authorUserId = authorUserId
       }
     },
     reactionAdded(state, action: PayloadAction<{ postId: string; reaction: ReactionName }>) {

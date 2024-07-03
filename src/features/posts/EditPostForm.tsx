@@ -33,14 +33,14 @@ export function EditPostForm() {
       )
     }
 
-    const newPost: Post = {
-      id: post.id,
-      title,
-      content,
-    }
-
     if (title && content) {
-      dispatch(postUpdated(newPost))
+      dispatch(
+        postUpdated({
+          id: post.id,
+          title,
+          content,
+        }),
+      )
       navigate(`/posts/${postId}`)
     }
   }
