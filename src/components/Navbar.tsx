@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { userLoggedOut } from '../features/auth/authSlice'
 import { UserIcon } from './UserIcon'
+import { selectCurrentUser } from '../features/users/usersSlice'
 
 export const Navbar = () => {
   const dispatch = useAppDispatch()
-  const currentUser = useAppSelector((state) => state.users.find((u) => u.id === state.auth.currentUserId))
+  const currentUser = useAppSelector(selectCurrentUser)
 
   const isLoggedIn = Boolean(currentUser)
   let navContent: ReactNode = null

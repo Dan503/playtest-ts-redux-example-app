@@ -1,6 +1,7 @@
 import { FormEvent } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { postAdded } from './postsSlice'
+import { selectCurrentUserId } from '../auth/authSlice'
 
 interface AddPostFormFields extends HTMLFormControlsCollection {
   postTitle: HTMLInputElement
@@ -13,7 +14,7 @@ interface AddPostFormElements extends HTMLFormElement {
 
 export function AddPostForm() {
   const dispatch = useAppDispatch()
-  const userId = useAppSelector((state) => state.auth.currentUserId) as string
+  const userId = useAppSelector(selectCurrentUserId) as string
 
   function handleSubmit(e: FormEvent<AddPostFormElements>) {
     e.preventDefault()

@@ -1,4 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { AppRootState } from '../../app/store'
 
 interface Auth {
   currentUserId: string | null
@@ -24,3 +25,6 @@ export const authSlice = createSlice({
 export const { userLoggedIn, userLoggedOut } = authSlice.actions
 
 export const authReducer = authSlice.reducer
+
+// == SELECTORS ==
+export const selectCurrentUserId = (state: AppRootState) => state.auth.currentUserId

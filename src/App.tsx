@@ -8,12 +8,13 @@ import { EditPostForm } from './features/posts/EditPostForm'
 import { LoginPage } from './features/auth/LoginPage'
 import { ReactNode } from 'react'
 import { useAppSelector } from './app/hooks'
+import { selectCurrentUserId } from './features/auth/authSlice'
 
 interface ProtectedRouteProps {
   children: ReactNode
 }
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const currentUserId = useAppSelector((state) => state.auth.currentUserId)
+  const currentUserId = useAppSelector(selectCurrentUserId)
 
   if (!currentUserId) {
     return <Navigate to="/" replace />

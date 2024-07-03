@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
 import { PostMetaData } from './PostMetaData'
-import { Post } from './postsSlice'
+import { Post, selectAllPosts } from './postsSlice'
 import { ReactionButtons } from './ReactionButtons'
 
 export function PostList() {
-  const posts = useAppSelector((state) => state.posts)
+  const posts = useAppSelector(selectAllPosts)
   const sortedPosts = posts.slice().sort((a, b) => b.isoDate.localeCompare(a.isoDate))
 
   return (

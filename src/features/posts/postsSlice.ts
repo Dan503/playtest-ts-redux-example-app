@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice, nanoid } from '@reduxjs/toolkit'
 import { Duration, sub } from 'date-fns'
 import { userLoggedOut } from '../auth/authSlice'
+import { AppRootState } from '../../app/store'
 
 // Define a TS type for the data we'll be using
 export interface Reactions {
@@ -105,3 +106,9 @@ export const { postAdded, postUpdated, reactionAdded } = postSlice.actions
 
 // Export the generated reducer function
 export const postReducer = postSlice.reducer
+
+// == SELECTORS ==
+export const selectAllPosts = (state: AppRootState) => state.posts
+export const selectPostById = (state: AppRootState, postId: string | undefined) => {
+  return state.posts.find((post) => post.id === postId)
+}

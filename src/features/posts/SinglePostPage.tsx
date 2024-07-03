@@ -2,11 +2,13 @@ import { Link, useParams } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
 import { PostMetaData } from './PostMetaData'
 import { ReactionButtons } from './ReactionButtons'
+import { selectPostById } from './postsSlice'
+import { selectCurrentUserId } from '../auth/authSlice'
 
 export function SinglePostPage() {
   const { postId } = useParams()
-  const currentUserId = useAppSelector((state) => state.auth.currentUserId)
-  const post = useAppSelector((state) => state.posts.find((post) => post.id === postId))
+  const currentUserId = useAppSelector(selectCurrentUserId)
+  const post = useAppSelector((state) => selectPostById(state, postId))
 
   if (!post) {
     return (
