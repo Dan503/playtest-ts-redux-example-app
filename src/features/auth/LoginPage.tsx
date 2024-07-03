@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { FormEvent } from 'react'
 import { userLoggedIn } from './authSlice'
 import { selectAllUsers } from '../users/usersSlice'
+import { Spinner } from '../../components/Spinner'
 
 interface LoginPageFormFields extends HTMLFormControlsCollection {
   userId: HTMLSelectElement
@@ -14,6 +15,7 @@ interface LoginPageFormElements extends HTMLFormElement {
 export function LoginPage() {
   const dispatch = useAppDispatch()
   const users = useAppSelector(selectAllUsers)
+  const userStatus = useAppSelector((state) => state.users.status)
   const navigate = useNavigate()
 
   function handleSubmit(e: FormEvent<LoginPageFormElements>) {
@@ -32,12 +34,17 @@ export function LoginPage() {
       <form onSubmit={handleSubmit}>
         <label htmlFor="userId">User:</label>
         <select id="userId" name="userId" required>
-          <option value="">-- Select a user to log in as --</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.name}
-            </option>
-          ))}
+          {userStatus === 'loading' && <option value="">Loading users...</option>}
+          {userStatus === 'success' && (
+            <>
+              <option value="">-- Select a user to log in as --</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name}
+                </option>
+              ))}
+            </>
+          )}
         </select>
         <button>Log in</button>
       </form>
