@@ -1,3 +1,4 @@
+// https://deploy-preview-4706--redux-docs.netlify.app/tutorials/essentials/part-6-performance-normalization
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { LoadingState } from '../../api/api.types'
 import { client } from '../../api/client'

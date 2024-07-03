@@ -9,6 +9,8 @@ import { LoginPage } from './features/auth/LoginPage'
 import { ReactNode } from 'react'
 import { useAppSelector } from './app/hooks'
 import { selectCurrentUserId } from './features/auth/authSlice'
+import { UsersList } from './features/users/UsersList'
+import { UserPage } from './features/users/UserPage'
 
 interface ProtectedRouteProps {
   children: ReactNode
@@ -44,8 +46,10 @@ function App() {
                       </>
                     }
                   />
-                  <Route path="/posts/:postId" element={<SinglePostPage />} />
-                  <Route path="/editPost/:postId" element={<EditPostForm />} />
+                  <Route path="/posts/:postId" Component={SinglePostPage} />
+                  <Route path="/editPost/:postId" Component={EditPostForm} />
+                  <Route path="/users" Component={UsersList} />
+                  <Route path="/users/:userId" Component={UserPage} />
                 </Routes>
               </ProtectedRoute>
             }
