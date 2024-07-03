@@ -1,7 +1,8 @@
-import { FormEvent } from 'react'
+import { FormEvent, useState } from 'react'
+import { LoadingStatusString } from '../../api/api.types'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { postAdded } from './postsSlice'
 import { selectCurrentUserId } from '../auth/authSlice'
+import { addNewPost } from './postsSlice'
 
 interface AddPostFormFields extends HTMLFormControlsCollection {
   postTitle: HTMLInputElement
@@ -15,30 +16,43 @@ interface AddPostFormElements extends HTMLFormElement {
 export function AddPostForm() {
   const dispatch = useAppDispatch()
   const userId = useAppSelector(selectCurrentUserId) as string
+  const [addRequestStatus, setAddRequestStatus] = useState<LoadingStatusString>('idle')
 
-  function handleSubmit(e: FormEvent<AddPostFormElements>) {
+  async function handleSubmit(e: FormEvent<AddPostFormElements>) {
     e.preventDefault()
 
     const { elements } = e.currentTarget
     const title = elements.postTitle.value
     const content = elements.postContent.value
 
-    dispatch(postAdded(title, content, userId))
+    const form = e.currentTarget
 
-    e.currentTarget.reset()
+    try {
+      setAddRequestStatus('loading')
+      await dispatch(addNewPost({ title, content, user: userId })).unwrap()
+      form.reset()
+    } catch (err) {
+      console.error('Failed to save the post: ', err)
+    } finally {
+      setAddRequestStatus('idle')
+    }
   }
+
+  const isSubmitting = addRequestStatus === 'loading'
 
   return (
     <section>
       <h2>Add a New Post</h2>
       <form onSubmit={handleSubmit}>
         <label htmlFor="postTitle">Post Title</label>
-        <input type="text" id="postTitle" defaultValue="" required />
+        <input type="text" id="postTitle" defaultValue="" required disabled={isSubmitting} />
 
         <label htmlFor="postContent">Content</label>
-        <textarea id="postContent" name="postContent" defaultValue="" required />
+        <textarea id="postContent" name="postContent" defaultValue="" required disabled={isSubmitting} />
 
-        <button type="submit">Save post</button>
+        <button type="submit" disabled={isSubmitting}>
+          Save post
+        </button>
       </form>
     </section>
   )

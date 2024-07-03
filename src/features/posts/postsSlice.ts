@@ -1,5 +1,4 @@
-import { PayloadAction, createAsyncThunk, createSlice, nanoid } from '@reduxjs/toolkit'
-import { Duration, sub } from 'date-fns'
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { LoadingState } from '../../api/api.types'
 import { client } from '../../api/client'
 import { AppRootState } from '../../app/store'
@@ -30,6 +29,7 @@ export interface Post {
 }
 
 type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
+type PostAddNew = Pick<Post, 'title' | 'content' | 'user'>
 
 export const fetchPosts = createAsyncThunk<Array<Post>, void, { state: AppRootState }>(
   'posts/fetchPosts',
@@ -48,17 +48,16 @@ export const fetchPosts = createAsyncThunk<Array<Post>, void, { state: AppRootSt
   },
 )
 
-function generateIsoDate(howLongAgo?: Duration) {
-  return sub(new Date(), howLongAgo || {}).toISOString()
-}
-
-const initialReactions: Reactions = {
-  thumbsUp: 0,
-  tada: 0,
-  heart: 0,
-  rocket: 0,
-  eyes: 0,
-}
+export const addNewPost = createAsyncThunk<Post, PostAddNew, { state: AppRootState }>(
+  'posts/addNewPost',
+  // The payload creator receives the partial `{title, content, user}` object
+  async (initialPost) => {
+    // We send the initial data to the fake API server
+    const response = await client.post<Post>('/fakeApi/posts', initialPost)
+    // The response includes the complete post object, including unique ID
+    return response.data
+  },
+)
 
 const initialState: PostsState = {
   postList: [],
@@ -70,25 +69,6 @@ const postSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
-    // Declare a "case reducer" named `postAdded`.
-    // The type of `action.payload` will be a `Post` object.
-    postAdded: {
-      reducer(state, action: PayloadAction<Post>) {
-        // "Mutate" the existing state array, which is
-        // safe to do here because `createSlice` uses Immer inside.
-        state.postList.push(action.payload)
-      },
-      prepare: (title: string, content: string, authorUserId: string) => ({
-        payload: {
-          id: nanoid(),
-          title,
-          content,
-          user: authorUserId,
-          date: generateIsoDate(),
-          reactions: initialReactions,
-        } satisfies Post,
-      }),
-    },
     postUpdated(state, action: PayloadAction<PostUpdate>) {
       const { title, content, id } = action.payload
       const postToUpdate = state.postList.find((item) => item.id === id)
@@ -124,11 +104,15 @@ const postSlice = createSlice({
         state.status = 'fail'
         state.error = action.error.message ?? 'Unknown Error'
       })
+      .addCase(addNewPost.fulfilled, (state, action) => {
+        // We can directly add the new post object to our posts array
+        state.postList.push(action.payload)
+      })
   },
 })
 
 // Export the auto-generated action creator with the same name
-export const { postAdded, postUpdated, reactionAdded } = postSlice.actions
+export const { postUpdated, reactionAdded } = postSlice.actions
 
 // Export the generated reducer function
 export const postReducer = postSlice.reducer
