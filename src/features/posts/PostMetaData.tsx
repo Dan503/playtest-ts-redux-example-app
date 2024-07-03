@@ -11,9 +11,9 @@ export function PostMetaData({ postId }: PostMeatDataProps) {
   const post = useAppSelector((state) => selectPostById(state, postId))
   return (
     <p>
-      <PostAuthor userId={post?.authorUserId} />
+      <PostAuthor userId={post?.user} />
       {' - '}
-      {post?.isoDate && <TimeAgo isoTime={post?.isoDate} />}
+      {post?.date && <TimeAgo isoTime={post?.date} />}
     </p>
   )
 }

@@ -1,19 +1,30 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useAppSelector } from '../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { Spinner } from '../../components/Spinner'
 import { PostMetaData } from './PostMetaData'
-import { Post, selectAllPosts } from './postsSlice'
 import { ReactionButtons } from './ReactionButtons'
+import { Post, fetchPosts, selectAllPosts } from './postsSlice'
 
 export function PostList() {
   const posts = useAppSelector(selectAllPosts)
-  const sortedPosts = posts.slice().sort((a, b) => b.isoDate.localeCompare(a.isoDate))
+  const postStatus = useAppSelector((state) => state.posts.status)
+  const sortedPosts = posts.slice().sort((a, b) => b.date.localeCompare(a.date))
+  const dispatch = useAppDispatch()
+  const errorMessage = useAppSelector((state) => state.posts.error)
+
+  useEffect(() => {
+    if (postStatus === 'idle') {
+      dispatch(fetchPosts())
+    }
+  }, [postStatus, dispatch])
 
   return (
     <section className="posts-list">
       <h2>Posts</h2>
-      {sortedPosts.map((post) => (
-        <PostExcerpt post={post} key={post.id} />
-      ))}
+      {postStatus === 'loading' && <Spinner text="Loading..." />}
+      {postStatus === 'fail' && errorMessage && <p>{errorMessage}</p>}
+      {postStatus === 'success' && sortedPosts.map((post) => <PostExcerpt post={post} key={post.id} />)}
     </section>
   )
 }

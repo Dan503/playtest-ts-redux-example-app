@@ -18,7 +18,7 @@ export function SinglePostPage() {
     )
   }
 
-  const canEdit = currentUserId === post.authorUserId
+  const canEdit = currentUserId === post.user
 
   return (
     <section>
