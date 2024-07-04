@@ -1,9 +1,10 @@
 // https://deploy-preview-4706--redux-docs.netlify.app/tutorials/essentials/part-6-performance-normalization
-import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { LoadingState } from '../../api/api.types'
 import { client } from '../../api/client'
 import { AppRootState } from '../../app/store'
 import { logout } from '../auth/authSlice'
+import { createAppAsyncThunk } from '../../app/withTypes'
 
 // Define a TS type for the data we'll be using
 export interface Reactions {
@@ -32,7 +33,7 @@ export interface Post {
 type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
 type PostAddNew = Pick<Post, 'title' | 'content' | 'user'>
 
-export const fetchPosts = createAsyncThunk<Array<Post>, void, { state: AppRootState }>(
+export const fetchPosts = createAppAsyncThunk(
   'posts/fetchPosts',
   async () => {
     const response = await client.get<Array<Post>>('/fakeApi/posts')
@@ -49,7 +50,7 @@ export const fetchPosts = createAsyncThunk<Array<Post>, void, { state: AppRootSt
   },
 )
 
-export const addNewPost = createAsyncThunk<Post, PostAddNew, { state: AppRootState }>(
+export const addNewPost = createAppAsyncThunk<Post, PostAddNew>(
   'posts/addNewPost',
   // The payload creator receives the partial `{title, content, user}` object
   async (initialPost) => {

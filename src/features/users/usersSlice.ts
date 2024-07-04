@@ -1,8 +1,9 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import { AppRootState } from '../../app/store'
 import { selectCurrentUserId } from '../auth/authSlice'
 import { client } from '../../api/client'
 import { LoadingState } from '../../api/api.types'
+import { createAppAsyncThunk } from '../../app/withTypes'
 
 export interface User {
   id: string
@@ -19,7 +20,7 @@ const initialState: UsersState = {
   userList: [],
 }
 
-export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
+export const fetchUsers = createAppAsyncThunk('users/fetchUsers', async () => {
   const response = await client.get<Array<User>>('fakeApi/users')
   return response.data
 })

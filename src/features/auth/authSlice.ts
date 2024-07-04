@@ -1,6 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import { AppRootState } from '../../app/store'
 import { client } from '../../api/client'
+import { createAppAsyncThunk } from '../../app/withTypes'
 
 interface Auth {
   currentUserId: string | null
@@ -10,12 +11,12 @@ const initialState: Auth = {
   currentUserId: null,
 }
 
-export const login = createAsyncThunk('auth/login', async (userName: string) => {
+export const login = createAppAsyncThunk('auth/login', async (userName: string) => {
   await client.post('/fakeApi/login', { userName })
   return userName
 })
 
-export const logout = createAsyncThunk('auth/logout', async () => {
+export const logout = createAppAsyncThunk('auth/logout', async () => {
   await client.post('/fakeApi/logout', {})
 })
 
