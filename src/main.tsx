@@ -9,6 +9,7 @@ import './index.css'
 import { Provider } from 'react-redux'
 import { store } from './app/store'
 import { fetchUsers } from './features/users/usersSlice'
+import { addPostListeners } from './features/posts/postsSlice'
 
 // Wrap app rendering so we can wait for the mock API to initialize
 async function start() {
@@ -18,6 +19,7 @@ async function start() {
   store.dispatch(fetchUsers())
 
   const root = createRoot(document.getElementById('root')!)
+  addPostListeners()
 
   root.render(
     <React.StrictMode>

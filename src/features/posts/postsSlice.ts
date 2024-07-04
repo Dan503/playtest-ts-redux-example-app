@@ -5,6 +5,7 @@ import { client } from '../../api/client'
 import { AppRootState } from '../../app/store'
 import { createAppAsyncThunk, initialLoadingState } from '../../app/withTypes'
 import { logout } from '../auth/authSlice'
+import { AppStartListening, startAppListening } from '../../app/listenerMiddleware'
 
 // Define a TS type for the data we'll be using
 export interface Reactions {
@@ -106,6 +107,25 @@ const postSlice = createSlice({
       .addCase(addNewPost.fulfilled, postsAdapter.addOne)
   },
 })
+
+export function addPostListeners() {
+  startAppListening({
+    actionCreator: addNewPost.fulfilled,
+    effect: async (_action, listenerApi) => {
+      debugger
+      const { toast } = await import('react-tiny-toast')
+
+      const toastId = toast.show('New post added!', {
+        variant: 'success',
+        position: 'bottom-right',
+        pause: true,
+      })
+
+      await listenerApi.delay(5000)
+      toast.remove(toastId)
+    },
+  })
+}
 
 // Export the auto-generated action creator with the same name
 export const { postUpdated, reactionAdded } = postSlice.actions
