@@ -52,3 +52,5 @@ const notificationSlice = createSlice({
 })
 
 export const notificationReducer = notificationSlice.reducer
+
+export const { allNotificationsRead } = notificationSlice.actions
