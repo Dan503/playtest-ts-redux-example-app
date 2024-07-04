@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../app/hooks'
+import { useAppDispatch, useAppSelector } from '../app/withTypes'
 import { logout } from '../features/auth/authSlice'
 import { UserIcon } from './UserIcon'
 import { selectCurrentUser } from '../features/users/usersSlice'

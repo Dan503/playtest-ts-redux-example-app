@@ -1,4 +1,4 @@
-import { useAppSelector } from '../../app/hooks'
+import { useAppSelector } from '../../app/withTypes'
 import { PostAuthor } from './PostAuthor'
 import { TimeAgo } from './TimeAgo'
 import { selectPostById } from './postsSlice'

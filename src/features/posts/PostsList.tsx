@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../app/withTypes'
 import { Spinner } from '../../components/Spinner'
 import { PostMetaData } from './PostMetaData'
 import { ReactionButtons } from './ReactionButtons'

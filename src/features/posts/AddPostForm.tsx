@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react'
 import { LoadingStatusString } from '../../api/api.types'
-import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../app/withTypes'
 import { selectCurrentUserId } from '../auth/authSlice'
 import { addNewPost } from './postsSlice'
 

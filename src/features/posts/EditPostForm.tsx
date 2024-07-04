@@ -1,5 +1,5 @@
 import { FormEvent } from 'react'
-import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../app/withTypes'
 import { Post, postUpdated, selectPostById } from './postsSlice'
 import { useNavigate, useParams } from 'react-router-dom'
 

@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { useAppSelector } from '../../app/hooks'
+import { useAppSelector } from '../../app/withTypes'
 import { PostMetaData } from './PostMetaData'
 import { ReactionButtons } from './ReactionButtons'
 import { selectPostById } from './postsSlice'
