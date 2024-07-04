@@ -1,9 +1,9 @@
 import { Action, ThunkAction, configureStore } from '@reduxjs/toolkit'
-import { postReducer } from '../features/posts/postsSlice'
-import { usersReducer } from '../features/users/usersSlice'
 import { authReducer } from '../features/auth/authSlice'
 import { notificationReducer } from '../features/notifications/notificationsSlice'
-import { LoadingState } from '../api/api.types'
+import { postReducer } from '../features/posts/postsSlice'
+import { usersReducer } from '../features/users/usersSlice'
+import { listenerMiddleware } from './listenerMiddleware'
 
 export const store = configureStore({
   // Pass in the root reducer setup as the `reducer` argument
@@ -13,6 +13,7 @@ export const store = configureStore({
     auth: authReducer,
     notifications: notificationReducer,
   },
+  middleware: (getDefaultMiddleWare) => getDefaultMiddleWare().prepend(listenerMiddleware.middleware),
 })
 
 // Infer the type of `store`
