@@ -4,14 +4,13 @@ import { useAppDispatch, useAppSelector } from '../../app/withTypes'
 import { Spinner } from '../../components/Spinner'
 import { PostMetaData } from './PostMetaData'
 import { ReactionButtons } from './ReactionButtons'
-import { Post, fetchPosts, selectAllPosts } from './postsSlice'
+import { fetchPosts, selectAllPostIds, selectPostById } from './postsSlice'
 
 export function PostList() {
-  const posts = useAppSelector(selectAllPosts)
   const postStatus = useAppSelector((state) => state.posts.status)
-  const sortedPosts = posts.slice().sort((a, b) => b.date.localeCompare(a.date))
   const dispatch = useAppDispatch()
   const errorMessage = useAppSelector((state) => state.posts.error)
+  const orderedPostIds = useAppSelector(selectAllPostIds)
 
   useEffect(() => {
     if (postStatus === 'idle') {
@@ -24,15 +23,16 @@ export function PostList() {
       <h2>Posts</h2>
       {postStatus === 'loading' && <Spinner text="Loading..." />}
       {postStatus === 'fail' && errorMessage && <p>{errorMessage}</p>}
-      {postStatus === 'success' && sortedPosts.map((post) => <PostExcerpt post={post} key={post.id} />)}
+      {postStatus === 'success' && orderedPostIds.map((postId) => <PostExcerpt postId={postId} key={postId} />)}
     </section>
   )
 }
 
 interface PostExcerptProps {
-  post: Post
+  postId: string
 }
-function PostExcerpt({ post }: PostExcerptProps) {
+function PostExcerpt({ postId }: PostExcerptProps) {
+  const post = useAppSelector((state) => selectPostById(state, postId))
   return (
     <article className="post-excerpt">
       <h3>

@@ -1,6 +1,6 @@
 // https://deploy-preview-4706--redux-docs.netlify.app/tutorials/essentials/part-6-performance-normalization
-import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
-import { LoadingState } from '../../api/api.types'
+import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
+import { EntityStateWithLoading } from '../../api/api.types'
 import { client } from '../../api/client'
 import { AppRootState } from '../../app/store'
 import { logout } from '../auth/authSlice'
@@ -17,9 +17,7 @@ export interface Reactions {
 
 export type ReactionName = keyof Reactions
 
-interface PostsState extends LoadingState {
-  postList: Array<Post>
-}
+type PostsState = EntityStateWithLoading<Post>
 
 export interface Post {
   id: string
@@ -32,6 +30,16 @@ export interface Post {
 
 type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
 type PostAddNew = Pick<Post, 'title' | 'content' | 'user'>
+
+const postsAdapter = createEntityAdapter<Post>({
+  // Sort in descending date order
+  sortComparer: (a, b) => b.date.localeCompare(a.date),
+})
+
+const initialState: PostsState = postsAdapter.getInitialState({
+  status: 'idle',
+  error: null,
+})
 
 export const fetchPosts = createAppAsyncThunk(
   'posts/fetchPosts',
@@ -61,19 +69,13 @@ export const addNewPost = createAppAsyncThunk<Post, PostAddNew>(
   },
 )
 
-const initialState: PostsState = {
-  postList: [],
-  error: null,
-  status: 'idle',
-}
-
 const postSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
     postUpdated(state, action: PayloadAction<PostUpdate>) {
       const { title, content, id } = action.payload
-      const postToUpdate = state.postList.find((item) => item.id === id)
+      const postToUpdate = state.entities[id]
       if (postToUpdate) {
         postToUpdate.title = title
         postToUpdate.content = content
@@ -81,7 +83,7 @@ const postSlice = createSlice({
     },
     reactionAdded(state, action: PayloadAction<{ postId: string; reaction: ReactionName }>) {
       const { postId, reaction } = action.payload
-      const existingPost = state.postList.find((post) => post.id === postId)
+      const existingPost = state.entities[postId]
       if (existingPost) {
         existingPost.reactions[reaction]++
       }
@@ -98,17 +100,13 @@ const postSlice = createSlice({
       })
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.status = 'success'
-        // Add any fetched posts to the array
-        state.postList.push(...action.payload)
+        postsAdapter.setAll(state, action.payload)
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = 'fail'
         state.error = action.error.message ?? 'Unknown Error'
       })
-      .addCase(addNewPost.fulfilled, (state, action) => {
-        // We can directly add the new post object to our posts array
-        state.postList.push(action.payload)
-      })
+      .addCase(addNewPost.fulfilled, postsAdapter.addOne)
   },
 })
 
@@ -119,10 +117,11 @@ export const { postUpdated, reactionAdded } = postSlice.actions
 export const postReducer = postSlice.reducer
 
 // == SELECTORS ==
-export const selectAllPosts = (state: AppRootState): Array<Post> => state.posts.postList
-export const selectPostById = (state: AppRootState, postId: string | undefined): Post | undefined => {
-  return state.posts.postList.find((post) => post.id === postId)
-}
+export const {
+  selectAll: selectAllPosts,
+  selectById: selectPostById,
+  selectIds: selectAllPostIds,
+} = postsAdapter.getSelectors<AppRootState>((state) => state.posts)
 
 export const selectPostByUserId = createSelector(
   // Pass in one or more "input selectors"
