@@ -2,7 +2,7 @@
 import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
 import { EntityStateWithLoading } from '../../api/api.types'
 import { client } from '../../api/client'
-import { AppRootState } from '../../app/store'
+import { AppRootState, initialLoadingState } from '../../app/store'
 import { logout } from '../auth/authSlice'
 import { createAppAsyncThunk } from '../../app/withTypes'
 
@@ -36,10 +36,7 @@ const postsAdapter = createEntityAdapter<Post>({
   sortComparer: (a, b) => b.date.localeCompare(a.date),
 })
 
-const initialState: PostsState = postsAdapter.getInitialState({
-  status: 'idle',
-  error: null,
-})
+const initialState: PostsState = postsAdapter.getInitialState(initialLoadingState)
 
 export const fetchPosts = createAppAsyncThunk(
   'posts/fetchPosts',

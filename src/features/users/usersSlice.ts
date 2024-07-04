@@ -1,24 +1,25 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { AppRootState } from '../../app/store'
-import { selectCurrentUserId } from '../auth/authSlice'
+import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
+import { EntityStateWithLoading } from '../../api/api.types'
 import { client } from '../../api/client'
-import { LoadingState } from '../../api/api.types'
+import { AppRootState, initialLoadingState } from '../../app/store'
 import { createAppAsyncThunk } from '../../app/withTypes'
+import { selectCurrentUserId } from '../auth/authSlice'
 
 export interface User {
   id: string
   name: string
 }
 
-interface UsersState extends LoadingState {
-  userList: Array<User>
+export const UNKNOWN_USER: User = {
+  name: 'Unknown User',
+  id: '',
 }
 
-const initialState: UsersState = {
-  error: null,
-  status: 'idle',
-  userList: [],
-}
+type UsersState = EntityStateWithLoading<User>
+
+const usersEntityAdapter = createEntityAdapter<User>()
+
+const initialState: UsersState = usersEntityAdapter.getInitialState(initialLoadingState)
 
 export const fetchUsers = createAppAsyncThunk('users/fetchUsers', async () => {
   const response = await client.get<Array<User>>('fakeApi/users')
@@ -29,12 +30,6 @@ const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {},
-  // Alternate method for writing selector functions
-  // WARNING! These only have access to the slice state, not the full root state!
-  selectors: {
-    selectAllUsers: (state) => state.userList,
-    selectUserById: (state, userId: string | undefined) => state.userList.find((u) => u.id === userId),
-  },
   extraReducers(builder) {
     builder
       .addCase(fetchUsers.pending, (state, _action) => {
@@ -46,7 +41,7 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.status = 'success'
-        state.userList = action.payload
+        usersEntityAdapter.setAll(state, action.payload)
       })
   },
 })
@@ -54,7 +49,11 @@ const usersSlice = createSlice({
 export const usersReducer = usersSlice.reducer
 
 // == SELECTORS ==
-export const { selectAllUsers, selectUserById } = usersSlice.selectors
+export const { selectAll: selectAllUsers, selectById: selectUserById } = usersEntityAdapter.getSelectors<AppRootState>(
+  (state) => state.users,
+)
 // This selector requires the use of the root state, so it cannot be written as a slice selector like the others
-export const selectCurrentUser = (state: AppRootState) =>
-  state.users.userList.find((u) => u.id === selectCurrentUserId(state))
+export const selectCurrentUser = (state: AppRootState) => {
+  const currentUserId = selectCurrentUserId(state)
+  return currentUserId ? state.users.entities[currentUserId] : UNKNOWN_USER
+}

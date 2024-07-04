@@ -3,6 +3,7 @@ import { postReducer } from '../features/posts/postsSlice'
 import { usersReducer } from '../features/users/usersSlice'
 import { authReducer } from '../features/auth/authSlice'
 import { notificationReducer } from '../features/notifications/notificationsSlice'
+import { LoadingState } from '../api/api.types'
 
 export const store = configureStore({
   // Pass in the root reducer setup as the `reducer` argument
@@ -22,3 +23,8 @@ export type AppDispatch = typeof store.dispatch
 export type AppRootState = ReturnType<typeof store.getState>
 // Export a reusable type for handwritten thunks
 export type AppThunk = ThunkAction<void, AppRootState, unknown, Action>
+
+export const initialLoadingState: LoadingState = {
+  error: null,
+  status: 'idle',
+}

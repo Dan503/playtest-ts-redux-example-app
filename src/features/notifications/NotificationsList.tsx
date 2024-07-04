@@ -1,15 +1,10 @@
 import { useAppDispatch, useAppSelector } from '../../app/withTypes'
 import { TimeAgo } from '../posts/TimeAgo'
-import { User, selectUserById } from '../users/usersSlice'
+import { UNKNOWN_USER, selectUserById } from '../users/usersSlice'
 import { ClientNotification, allNotificationsRead, selectAllNotifications } from './notificationsSlice'
 import { Link } from 'react-router-dom'
 import { useLayoutEffect } from 'react'
 import classNames from 'classnames'
-
-const UNKNOWN_USER: User = {
-  name: 'Unknown User',
-  id: '',
-}
 
 export function NotificationsList() {
   const notifications = useAppSelector(selectAllNotifications)
