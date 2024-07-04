@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
 import { AppRootState } from '../../app/store'
 import { client } from '../../api/client'
 import { createAppAsyncThunk } from '../../app/withTypes'
@@ -14,7 +14,17 @@ export interface ClientNotification extends ServerNotification {
   isNew: boolean
 }
 
-export const selectAllNotifications = (state: AppRootState) => state.notifications
+const notificationAdapter = createEntityAdapter<ClientNotification>({
+  sortComparer: (a, b) => b.date.localeCompare(a.date),
+})
+
+const initialState = notificationAdapter.getInitialState()
+
+export const {
+  selectAll: selectAllNotifications,
+  selectById: selectNotificationById,
+  selectIds: selectNotificationIds,
+} = notificationAdapter.getSelectors<AppRootState>((state) => state.notifications)
 
 export const fetchNotifications = createAppAsyncThunk('notifications/fetchNotifications', async (_unused, thunkApi) => {
   const allNotifications = selectAllNotifications(thunkApi.getState())
@@ -24,14 +34,14 @@ export const fetchNotifications = createAppAsyncThunk('notifications/fetchNotifi
   return response.data
 })
 
-const initialState: Array<ClientNotification> = []
-
 const notificationSlice = createSlice({
   name: 'notifications',
   initialState,
   reducers: {
     allNotificationsRead(state) {
-      state.forEach((n) => (n.isRead = true))
+      Object.values(state.entities).forEach((notification) => {
+        notification.isRead = true
+      })
     },
   },
   extraReducers(builder) {
@@ -41,12 +51,12 @@ const notificationSlice = createSlice({
         isRead: false,
         isNew: true,
       }))
-      state.forEach((n) => {
-        // Any notifications we have read are not new anymore
-        n.isNew = !n.isRead
+      Object.values(state.entities).forEach((notification) => {
+        // Any notifications we've read are no longer new
+        notification.isNew = !notification.isRead
       })
-      state.push(...notificationsWithMetadata)
-      state.sort((a, b) => b.date.localeCompare(a.date))
+
+      notificationAdapter.upsertMany(state, notificationsWithMetadata)
     })
   },
 })

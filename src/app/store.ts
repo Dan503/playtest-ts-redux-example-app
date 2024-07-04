@@ -23,8 +23,3 @@ export type AppDispatch = typeof store.dispatch
 export type AppRootState = ReturnType<typeof store.getState>
 // Export a reusable type for handwritten thunks
 export type AppThunk = ThunkAction<void, AppRootState, unknown, Action>
-
-export const initialLoadingState: LoadingState = {
-  error: null,
-  status: 'idle',
-}

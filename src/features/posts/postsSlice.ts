@@ -1,10 +1,10 @@
 // https://deploy-preview-4706--redux-docs.netlify.app/tutorials/essentials/part-6-performance-normalization
-import { EntityState, PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
 import { EntityStateWithLoading } from '../../api/api.types'
 import { client } from '../../api/client'
-import { AppRootState, initialLoadingState } from '../../app/store'
+import { AppRootState } from '../../app/store'
+import { createAppAsyncThunk, initialLoadingState } from '../../app/withTypes'
 import { logout } from '../auth/authSlice'
-import { createAppAsyncThunk } from '../../app/withTypes'
 
 // Define a TS type for the data we'll be using
 export interface Reactions {

@@ -1,8 +1,8 @@
 import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
 import { EntityStateWithLoading } from '../../api/api.types'
 import { client } from '../../api/client'
-import { AppRootState, initialLoadingState } from '../../app/store'
-import { createAppAsyncThunk } from '../../app/withTypes'
+import { AppRootState } from '../../app/store'
+import { createAppAsyncThunk, initialLoadingState } from '../../app/withTypes'
 import { selectCurrentUserId } from '../auth/authSlice'
 
 export interface User {
