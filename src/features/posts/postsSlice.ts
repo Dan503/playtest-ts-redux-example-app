@@ -1,5 +1,5 @@
 // https://deploy-preview-4706--redux-docs.netlify.app/tutorials/essentials/part-6-performance-normalization
-import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
 import { LoadingState } from '../../api/api.types'
 import { client } from '../../api/client'
 import { AppRootState } from '../../app/store'
@@ -123,3 +123,19 @@ export const selectAllPosts = (state: AppRootState): Array<Post> => state.posts.
 export const selectPostById = (state: AppRootState, postId: string | undefined): Post | undefined => {
   return state.posts.postList.find((post) => post.id === postId)
 }
+
+export const selectPostByUserId = createSelector(
+  // Pass in one or more "input selectors"
+  [
+    // Outputs to PARAM 1
+    // we can pass in an existing selector function that
+    // reads something from the root `state` and returns it
+    selectAllPosts,
+    // Outputs to PARAM 2
+    // This function extracts another argument and returns that
+    (_state: AppRootState, userId: string) => userId,
+  ],
+  // the output function gets those values as its arguments,
+  // and will run when either input value changes
+  (/* PARAM 1 */ posts, /* PARAM 2 */ userId) => posts.filter((post) => post.user === userId),
+)

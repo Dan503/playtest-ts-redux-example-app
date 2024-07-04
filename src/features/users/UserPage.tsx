@@ -1,16 +1,12 @@
 import { Link, useParams } from 'react-router-dom'
 import { useAppSelector } from '../../app/withTypes'
 import { selectUserById } from './usersSlice'
-import { selectAllPosts } from '../posts/postsSlice'
+import { selectPostByUserId } from '../posts/postsSlice'
 
 export function UserPage() {
   const { userId } = useParams()
   const user = useAppSelector((state) => selectUserById(state, userId))
-  const postsByUser = useAppSelector((state) => {
-    const allPosts = selectAllPosts(state)
-    // ⁉️ This seems sketchy!
-    return allPosts.filter((post) => post.user === userId)
-  })
+  const postsByUser = useAppSelector((state) => selectPostByUserId(state, userId!))
 
   if (!user) {
     return (
