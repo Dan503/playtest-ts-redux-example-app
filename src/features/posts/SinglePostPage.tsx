@@ -1,21 +1,32 @@
 import { Link, useParams } from 'react-router-dom'
+import { useGetPostByIdQuery } from '../../app/apiSlice'
 import { useAppSelector } from '../../app/withTypes'
+import { Spinner } from '../../components/Spinner'
+import { selectCurrentUserId } from '../auth/authSlice'
 import { PostMetaData } from './PostMetaData'
 import { ReactionButtons } from './ReactionButtons'
-import { selectPostById } from './postsSlice'
-import { selectCurrentUserId } from '../auth/authSlice'
 
 export function SinglePostPage() {
   const { postId } = useParams()
   const currentUserId = useAppSelector(selectCurrentUserId)
-  const post = useAppSelector((state) => selectPostById(state, postId))
 
-  if (!post) {
+  const { data: post, isError, error, isFetching, isSuccess } = useGetPostByIdQuery(postId!)
+
+  if (isFetching) {
+    return <Spinner text="Loading..." />
+  }
+
+  if (isError) {
     return (
       <section>
-        <h2>Post not found!</h2>
+        <h2>An error occured</h2>
+        <p>{error.toString()}</p>
       </section>
     )
+  }
+
+  if (!isSuccess) {
+    return null
   }
 
   const canEdit = currentUserId === post.user
