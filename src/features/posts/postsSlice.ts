@@ -24,13 +24,13 @@ export interface Post {
   id: string
   title: string
   content: string
-  user?: string
+  user?: string | null
   date: string
   reactions: Reactions
 }
 
-type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
-type PostAddNew = Pick<Post, 'title' | 'content' | 'user'>
+export type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
+export type PostAddNew = Pick<Post, 'title' | 'content' | 'user'>
 
 const postsAdapter = createEntityAdapter<Post>({
   // Sort in descending date order

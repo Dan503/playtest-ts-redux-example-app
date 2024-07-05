@@ -3,6 +3,7 @@ import { LoadingStatusString } from '../../api/api.types'
 import { useAppDispatch, useAppSelector } from '../../app/withTypes'
 import { selectCurrentUserId } from '../auth/authSlice'
 import { addNewPost } from './postsSlice'
+import { useAddNewPostMutation } from '../../app/apiSlice'
 
 interface AddPostFormFields extends HTMLFormControlsCollection {
   postTitle: HTMLInputElement
@@ -14,9 +15,8 @@ interface AddPostFormElements extends HTMLFormElement {
 }
 
 export function AddPostForm() {
-  const dispatch = useAppDispatch()
-  const userId = useAppSelector(selectCurrentUserId) as string
-  const [addRequestStatus, setAddRequestStatus] = useState<LoadingStatusString>('idle')
+  const userId = useAppSelector(selectCurrentUserId)
+  const [addNewPost, { isLoading }] = useAddNewPostMutation()
 
   async function handleSubmit(e: FormEvent<AddPostFormElements>) {
     e.preventDefault()
@@ -28,29 +28,25 @@ export function AddPostForm() {
     const form = e.currentTarget
 
     try {
-      setAddRequestStatus('loading')
-      await dispatch(addNewPost({ title, content, user: userId })).unwrap()
+      await addNewPost({ title, content, user: userId }).unwrap()
+
       form.reset()
     } catch (err) {
       console.error('Failed to save the post: ', err)
-    } finally {
-      setAddRequestStatus('idle')
     }
   }
-
-  const isSubmitting = addRequestStatus === 'loading'
 
   return (
     <section>
       <h2>Add a New Post</h2>
       <form onSubmit={handleSubmit}>
         <label htmlFor="postTitle">Post Title</label>
-        <input type="text" id="postTitle" defaultValue="" required disabled={isSubmitting} />
+        <input type="text" id="postTitle" defaultValue="" required disabled={isLoading} />
 
         <label htmlFor="postContent">Content</label>
-        <textarea id="postContent" name="postContent" defaultValue="" required disabled={isSubmitting} />
+        <textarea id="postContent" name="postContent" defaultValue="" required disabled={isLoading} />
 
-        <button type="submit" disabled={isSubmitting}>
+        <button type="submit" disabled={isLoading}>
           Save post
         </button>
       </form>
