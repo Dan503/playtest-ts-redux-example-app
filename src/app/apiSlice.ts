@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { PostAddNew, Post } from '../features/posts/postsSlice'
+import { PostAddNew, Post, PostUpdate } from '../features/posts/postsSlice'
 
 enum ApiTag {
   post = 'post',
@@ -20,10 +20,14 @@ export const apiSlice = createApi({
     getPosts: builder.query<Array<Post>, void>({
       // The URL for the request is '/fakeApi/posts'
       query: () => '/posts',
-      providesTags: [ApiTag.post],
+      providesTags: (result = [], _error, _arg) => [
+        ApiTag.post,
+        ...result.map(({ id }) => ({ type: ApiTag.post, id }) as const),
+      ],
     }),
-    getPostById: builder.query<Post, string>({
+    getPostById: builder.query<Post, string | undefined>({
       query: (postId) => `/posts/${postId}`,
+      providesTags: (_result, _error, arg) => [{ type: ApiTag.post, id: arg }],
     }),
     addNewPost: builder.mutation<Post, PostAddNew>({
       query: (newPostData) => ({
@@ -34,8 +38,16 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: [ApiTag.post],
     }),
+    editPost: builder.mutation<Post, PostUpdate>({
+      query: (post) => ({
+        url: `posts/${post.id}`,
+        method: 'PATCH',
+        body: post,
+      }),
+      invalidatesTags: (_result, _error, arg) => [{ type: ApiTag.post, id: arg.id }],
+    }),
   }),
 })
 
 // Export the auto-generated hook for the `getPosts` query endpoint
-export const { useGetPostsQuery, useGetPostByIdQuery, useAddNewPostMutation } = apiSlice
+export const { useGetPostsQuery, useGetPostByIdQuery, useAddNewPostMutation, useEditPostMutation } = apiSlice

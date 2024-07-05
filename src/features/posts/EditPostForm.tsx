@@ -1,7 +1,6 @@
 import { FormEvent } from 'react'
-import { useAppDispatch, useAppSelector } from '../../app/withTypes'
-import { Post, postUpdated, selectPostById } from './postsSlice'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useEditPostMutation, useGetPostByIdQuery } from '../../app/apiSlice'
 
 interface EditPostFormFields extends HTMLFormControlsCollection {
   postTitle: HTMLInputElement
@@ -14,11 +13,13 @@ interface EditPostFormElements extends HTMLFormElement {
 
 export function EditPostForm() {
   const { postId } = useParams()
-  const dispatch = useAppDispatch()
-  const post = useAppSelector((state) => selectPostById(state, postId))
   const navigate = useNavigate()
 
-  function handleSubmit(e: FormEvent<EditPostFormElements>) {
+  const { data: post } = useGetPostByIdQuery(postId)
+
+  const [updatePost, { isLoading }] = useEditPostMutation()
+
+  async function handleSubmit(e: FormEvent<EditPostFormElements>) {
     e.preventDefault()
 
     const { elements } = e.currentTarget
@@ -34,13 +35,7 @@ export function EditPostForm() {
     }
 
     if (title && content) {
-      dispatch(
-        postUpdated({
-          id: post.id,
-          title,
-          content,
-        }),
-      )
+      await updatePost({ id: post.id, title, content })
       navigate(`/posts/${postId}`)
     }
   }
@@ -50,12 +45,14 @@ export function EditPostForm() {
       <h2>Edit Post</h2>
       <form onSubmit={handleSubmit}>
         <label htmlFor="postTitle">Post Title</label>
-        <input type="text" id="postTitle" defaultValue={post?.title} required />
+        <input type="text" id="postTitle" defaultValue={post?.title} required disabled={isLoading} />
 
         <label htmlFor="postContent">Content</label>
-        <textarea id="postContent" name="postContent" defaultValue={post?.content} required />
+        <textarea id="postContent" name="postContent" defaultValue={post?.content} required disabled={isLoading} />
 
-        <button type="submit">Save post</button>
+        <button type="submit" disabled={isLoading}>
+          Save post
+        </button>
       </form>
     </section>
   )

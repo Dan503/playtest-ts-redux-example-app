@@ -10,7 +10,7 @@ export function SinglePostPage() {
   const { postId } = useParams()
   const currentUserId = useAppSelector(selectCurrentUserId)
 
-  const { data: post, isError, error, isFetching, isSuccess } = useGetPostByIdQuery(postId!)
+  const { data: post, isError, error, isFetching, isSuccess } = useGetPostByIdQuery(postId)
 
   if (isFetching) {
     return <Spinner text="Loading..." />
