@@ -4,16 +4,20 @@ import { notificationReducer } from '../features/notifications/notificationsSlic
 import { postReducer } from '../features/posts/postsSlice'
 import { usersReducer } from '../features/users/usersSlice'
 import { listenerMiddleware } from './listenerMiddleware'
+import { apiSlice } from './apiSlice'
 
 export const store = configureStore({
   // Pass in the root reducer setup as the `reducer` argument
   reducer: {
+    [apiSlice.reducerPath]: apiSlice.reducer,
     posts: postReducer,
     users: usersReducer,
     auth: authReducer,
     notifications: notificationReducer,
   },
-  middleware: (getDefaultMiddleWare) => getDefaultMiddleWare().prepend(listenerMiddleware.middleware),
+  middleware: (getDefaultMiddleWare) => {
+    return getDefaultMiddleWare().prepend(listenerMiddleware.middleware).concat(apiSlice.middleware)
+  },
 })
 
 // Infer the type of `store`
