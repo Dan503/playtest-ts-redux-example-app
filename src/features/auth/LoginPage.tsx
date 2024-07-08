@@ -14,7 +14,6 @@ interface LoginPageFormElements extends HTMLFormElement {
 export function LoginPage() {
   const dispatch = useAppDispatch()
   const users = useAppSelector(selectAllUsers)
-  const userStatus = useAppSelector((state) => state.users.status)
   const navigate = useNavigate()
 
   async function handleSubmit(e: FormEvent<LoginPageFormElements>) {
@@ -32,8 +31,8 @@ export function LoginPage() {
       <form onSubmit={handleSubmit}>
         <label htmlFor="userId">User:</label>
         <select id="userId" name="userId" required>
-          {userStatus === 'loading' && <option value="">Loading users...</option>}
-          {userStatus === 'success' && (
+          {users.length <= 0 && <option value="">Loading users...</option>}
+          {users.length > 0 && (
             <>
               <option value="">-- Select a user to log in as --</option>
               {users.map((u) => (
