@@ -27,6 +27,14 @@ export const fetchUsers = createAppAsyncThunk('users/fetchUsers', async () => {
   return response.data
 })
 
+export const extendedApiSlice = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    getUsers: builder.query<Array<User>, void>({
+      query: () => '/users',
+    }),
+  }),
+})
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,

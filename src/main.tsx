@@ -9,14 +9,14 @@ import './index.css'
 import { Provider } from 'react-redux'
 import { store } from './app/store'
 import { addPostListeners } from './features/posts/postsSlice'
-import { apiSlice } from './app/apiSlice'
+import { extendedApiSlice } from './features/users/usersSlice'
 
 // Wrap app rendering so we can wait for the mock API to initialize
 async function start() {
   // Start our mock API server
   await worker.start({ onUnhandledRequest: 'bypass' })
 
-  store.dispatch(apiSlice.endpoints.getUsers.initiate())
+  store.dispatch(extendedApiSlice.endpoints.getUsers.initiate())
 
   const root = createRoot(document.getElementById('root')!)
   addPostListeners()

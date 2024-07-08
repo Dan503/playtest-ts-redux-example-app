@@ -55,11 +55,6 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: (_result, _error, arg) => [{ type: TagType.post, id: arg.id }],
     }),
-
-    // = USERS =
-    getUsers: builder.query<User[], void>({
-      query: () => '/users',
-    }),
   }),
 })
 
