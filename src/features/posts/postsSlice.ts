@@ -1,4 +1,3 @@
-// https://deploy-preview-4706--redux-docs.netlify.app/tutorials/essentials/part-7-rtk-query-basics
 import { PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
 import { EntityStateWithLoading } from '../../api/api.types'
 import { client } from '../../api/client'
@@ -6,6 +5,7 @@ import { startAppListening } from '../../app/listenerMiddleware'
 import { AppRootState } from '../../app/store'
 import { createAppAsyncThunk, initialLoadingState } from '../../app/withTypes'
 import { logout } from '../auth/authSlice'
+import { apiSlice } from '../../app/apiSlice'
 
 // Define a TS type for the data we'll be using
 export interface Reactions {
@@ -110,9 +110,8 @@ const postSlice = createSlice({
 
 export function addPostListeners() {
   startAppListening({
-    actionCreator: addNewPost.fulfilled,
+    matcher: apiSlice.endpoints.addNewPost.matchFulfilled,
     effect: async (_action, listenerApi) => {
-      debugger
       const { toast } = await import('react-tiny-toast')
 
       const toastId = toast.show('New post added!', {
