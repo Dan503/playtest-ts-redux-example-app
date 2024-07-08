@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { PostAddNew, Post, PostUpdate } from '../features/posts/postsSlice'
+import { User } from '../features/users/usersSlice'
 
 enum TagType {
   post = 'post',
@@ -22,6 +23,7 @@ export const apiSlice = createApi({
   tagTypes: [TagType.post],
   // The "endpoints" represent operations and requests for this server
   endpoints: (builder) => ({
+    // = POSTS =
     // The `getPosts` endpoint is a "query" operation that returns data.
     // The return value is a `Post[]` array, and it takes no arguments.
     getPosts: builder.query<Array<Post>, void>({
@@ -53,8 +55,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: (_result, _error, arg) => [{ type: TagType.post, id: arg.id }],
     }),
+
+    // = USERS =
+    getUsers: builder.query<User[], void>({
+      query: () => '/users',
+    }),
   }),
 })
 
 // Export the auto-generated hook for the `getPosts` query endpoint
-export const { useGetPostsQuery, useGetPostByIdQuery, useAddNewPostMutation, useEditPostMutation } = apiSlice
+export const { useGetPostsQuery, useGetPostByIdQuery, useAddNewPostMutation, useEditPostMutation, useGetUsersQuery } =
+  apiSlice

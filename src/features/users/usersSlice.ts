@@ -1,9 +1,10 @@
-import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
+import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
 import { EntityStateWithLoading } from '../../api/api.types'
 import { client } from '../../api/client'
 import { AppRootState } from '../../app/store'
 import { createAppAsyncThunk, initialLoadingState } from '../../app/withTypes'
 import { selectCurrentUserId } from '../auth/authSlice'
+import { apiSlice } from '../../app/apiSlice'
 
 export interface User {
   id: string
@@ -48,12 +49,37 @@ const usersSlice = createSlice({
 
 export const usersReducer = usersSlice.reducer
 
+const emptyUsers: Array<User> = []
+
 // == SELECTORS ==
-export const { selectAll: selectAllUsers, selectById: selectUserById } = usersEntityAdapter.getSelectors<AppRootState>(
-  (state) => state.users,
+
+// Calling `someEndpoint.select(someArg)` generates a new selector that will return
+// the query result object for a query with those parameters.
+// To generate a selector for a specific query argument, call `select(theQueryArg)`.
+// In this case, the users query has no params, so we don't pass anything to select()
+export const selectUsersResult = apiSlice.endpoints.getUsers.select()
+
+export const selectAllUsers = createSelector(selectUsersResult, (usersResult) => usersResult?.data ?? emptyUsers)
+export const selectUserById = createSelector(
+  selectAllUsers,
+  (_state: AppRootState, userId: string | undefined) => userId,
+  (users, userId) => users.find((user) => user.id === userId),
 )
-// This selector requires the use of the root state, so it cannot be written as a slice selector like the others
+
 export const selectCurrentUser = (state: AppRootState) => {
-  const currentUserId = selectCurrentUserId(state)
-  return currentUserId ? state.users.entities[currentUserId] : UNKNOWN_USER
+  const currentUsername = selectCurrentUserId(state)
+  if (currentUsername) {
+    return selectUserById(state, currentUsername)
+  }
 }
+
+// = OLD SELECTORS =
+
+// export const { selectAll: selectAllUsers, selectById: selectUserById } = usersEntityAdapter.getSelectors<AppRootState>(
+//   (state) => state.users,
+// )
+// // This selector requires the use of the root state, so it cannot be written as a slice selector like the others
+// export const selectCurrentUser = (state: AppRootState) => {
+//   const currentUserId = selectCurrentUserId(state)
+//   return currentUserId ? state.users.entities[currentUserId] : UNKNOWN_USER
+// }
