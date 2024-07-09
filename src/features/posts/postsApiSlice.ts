@@ -1,6 +1,6 @@
 import { createEntityAdapter, EntityState } from '@reduxjs/toolkit'
 import { apiSlice, emptyEntities, TagType } from '../../app/apiSlice'
-import { Post } from './postsSlice'
+import { Post, ReactionName } from './postsSlice'
 
 export type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
 export type PostAddNew = Pick<Post, 'title' | 'content' | 'user'>
@@ -51,8 +51,24 @@ export const postsApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, arg) => [{ type: TagType.post, id: arg.id }],
     }),
+    addReaction: builder.mutation<Post, { postId: string; reaction: ReactionName }>({
+      query: ({ postId, reaction }) => ({
+        url: `posts/${postId}/reactions`,
+        method: 'POST',
+        // In a real app, we'd probably need to base this on user ID somehow
+        // so that a user can't do the same reaction more than once
+        body: { reaction },
+      }),
+      invalidatesTags: (_result, _error, arg) => [{ type: TagType.post, id: arg.postId }],
+    }),
   }),
 })
 
 // Export the auto-generated hook for the `getPosts` query endpoint
-export const { useGetPostsQuery, useGetPostByIdQuery, useAddNewPostMutation, useEditPostMutation } = postsApiSlice
+export const {
+  useGetPostsQuery,
+  useGetPostByIdQuery,
+  useAddNewPostMutation,
+  useEditPostMutation,
+  useAddReactionMutation,
+} = postsApiSlice
