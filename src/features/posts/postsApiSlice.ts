@@ -59,7 +59,32 @@ export const postsApiSlice = apiSlice.injectEndpoints({
         // so that a user can't do the same reaction more than once
         body: { reaction },
       }),
-      invalidatesTags: (_result, _error, arg) => [{ type: TagType.post, id: arg.postId }],
+      // `updateQueryData` requires the endpoint name and cache key arguments,
+      // so it knows which piece of cache state to update
+      async onQueryStarted({ postId, reaction }, { dispatch, queryFulfilled }) {
+        const getMultiPostPatchResult = dispatch(
+          postsApiSlice.util.updateQueryData('getPosts', undefined, (draft) => {
+            // The `draft` is Immer-wrapped and can be "mutated" like in createSlice
+            const post = draft.entities[postId]
+            post.reactions[reaction]++
+          }),
+        )
+
+        // We also have another copy of the same data in the `getPost` cache
+        // entry for this post ID, so we need to update that as well
+        const getSinglePostPatchResult = dispatch(
+          postsApiSlice.util.updateQueryData('getPostById', postId, (draft) => {
+            draft.reactions[reaction]++
+          }),
+        )
+
+        try {
+          await queryFulfilled
+        } catch {
+          getSinglePostPatchResult.undo()
+          getMultiPostPatchResult.undo()
+        }
+      },
     }),
   }),
 })
