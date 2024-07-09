@@ -10,7 +10,8 @@ export const Navbar = () => {
   const dispatch = useAppDispatch()
   const currentUser = useAppSelector(selectCurrentUser)
 
-  const isLoggedIn = Boolean(currentUser)
+  const isLoggedIn = Boolean(currentUser.id)
+  console.log({ currentUser })
   let navContent: ReactNode = null
 
   const notifications = useAppSelector(selectAllNotifications)

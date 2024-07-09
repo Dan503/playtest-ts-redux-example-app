@@ -54,5 +54,5 @@ export const { selectAll: selectAllUsers, selectById: selectUserById } = usersEn
 // This selector requires the use of the root state, so it cannot be written as a slice selector like the others
 export const selectCurrentUser = (state: AppRootState) => {
   const currentUserId = selectCurrentUserId(state)
-  return currentUserId ? state.users.entities[currentUserId] : UNKNOWN_USER
+  return currentUserId ? selectUserById(state, currentUserId) : UNKNOWN_USER
 }
