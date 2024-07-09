@@ -1,28 +1,34 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../app/withTypes'
 import { logout } from '../features/auth/authSlice'
-import { UserIcon } from './UserIcon'
+import {
+  fetchNotificationsWebsocket,
+  selectNotificationsMetadata,
+  useGetNotificationsQuery,
+} from '../features/notifications/notificationsSlice'
 import { selectCurrentUser } from '../features/users/usersSlice'
-import { fetchNotifications, selectAllNotifications } from '../features/notifications/notificationsSlice'
+import { UserIcon } from './UserIcon'
 
 export const Navbar = () => {
   const dispatch = useAppDispatch()
   const currentUser = useAppSelector(selectCurrentUser)
 
-  const isLoggedIn = Boolean(currentUser.id)
-  console.log({ currentUser })
   let navContent: ReactNode = null
 
-  const notifications = useAppSelector(selectAllNotifications)
-  const numUnreadNotifications = notifications.filter((n) => !n.isRead).length
+  useGetNotificationsQuery()
+
+  const notificationsMetaData = useAppSelector(selectNotificationsMetadata)
+  const numUnreadNotifications = notificationsMetaData.filter((n) => !n.isRead).length
+
+  const isLoggedIn = Boolean(currentUser.id)
 
   if (isLoggedIn) {
     async function onLogOutClicked() {
       await dispatch(logout())
     }
     async function fetchNewNotifications() {
-      await dispatch(fetchNotifications())
+      await dispatch(fetchNotificationsWebsocket())
     }
 
     const unreadNotificationBadge =

@@ -1,14 +1,22 @@
+import classNames from 'classnames'
+import { useLayoutEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/withTypes'
 import { TimeAgo } from '../posts/TimeAgo'
-import { UNKNOWN_USER, selectUserById } from '../users/usersSlice'
-import { ClientNotification, allNotificationsRead, selectAllNotifications } from './notificationsSlice'
-import { Link } from 'react-router-dom'
-import { useLayoutEffect } from 'react'
-import classNames from 'classnames'
+import { selectUserById, UNKNOWN_USER } from '../users/usersSlice'
+import {
+  allNotificationsRead,
+  NotificationMetaData,
+  selectMetadataEntities,
+  ServerNotification,
+  useGetNotificationsQuery,
+} from './notificationsSlice'
 
 export function NotificationsList() {
-  const notifications = useAppSelector(selectAllNotifications)
   const dispatch = useAppDispatch()
+
+  const { data: notifications = [] } = useGetNotificationsQuery()
+  const notificationsMetaData = useAppSelector(selectMetadataEntities)
 
   useLayoutEffect(() => {
     console.log('dispatch(allNotificationsRead())')
@@ -18,20 +26,22 @@ export function NotificationsList() {
   return (
     <section className="notificationsList">
       <h2>Notifications</h2>
-      {notifications.map((n) => (
-        <NotificationItem notification={n} key={n.id} />
-      ))}
+      {notifications.map((n) => {
+        const metadata = notificationsMetaData[n.id]
+        return <NotificationItem notification={n} metaData={metadata} key={n.id} />
+      })}
     </section>
   )
 }
 
 interface NotificationItemProps {
-  notification: ClientNotification
+  notification: ServerNotification
+  metaData: NotificationMetaData
 }
-function NotificationItem({ notification }: NotificationItemProps) {
+function NotificationItem({ notification, metaData }: NotificationItemProps) {
   const user = useAppSelector((state) => selectUserById(state, notification.user)) || UNKNOWN_USER
   const notificationClassName = classNames('notification', {
-    new: notification.isNew,
+    new: metaData.isNew,
   })
   return (
     <article key={notification.id} className={notificationClassName}>
