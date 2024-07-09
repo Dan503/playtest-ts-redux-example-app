@@ -1,16 +1,17 @@
 import { Link } from 'react-router-dom'
-import { useGetPostsQuery } from '../../app/apiSlice'
 import { Spinner } from '../../components/Spinner'
 import { PostMetaData } from './PostMetaData'
 import { ReactionButtons } from './ReactionButtons'
-import { Post } from './postsSlice'
+import { Post, selectAllPosts } from './postsSlice'
 import { useMemo } from 'react'
 import classNames from 'classnames'
+import { useGetPostsQuery } from './postsApiSlice'
+import { emptyEntities } from '../../app/apiSlice'
+import { useAppSelector } from '../../app/withTypes'
 
 export function PostList() {
-  const { data: posts = [], isLoading, isSuccess, isError, error, isFetching } = useGetPostsQuery()
-
-  const sortedPosts = useMemo(() => posts.toSorted((a, b) => b.date.localeCompare(a.date)), [posts])
+  const { isLoading, isSuccess, isError, error, isFetching } = useGetPostsQuery()
+  const posts = useAppSelector((state) => selectAllPosts(state))
 
   const containerClassName = classNames('posts-container', {
     disabled: isFetching,
@@ -23,7 +24,7 @@ export function PostList() {
       {isError && <p>{error.toString()}</p>}
       {isSuccess && (
         <div className={containerClassName}>
-          {sortedPosts.map((post) => (
+          {posts.map((post) => (
             <PostExcerpt post={post} key={post.id} />
           ))}
         </div>

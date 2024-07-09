@@ -1,10 +1,10 @@
 import { Link, useParams } from 'react-router-dom'
-import { useGetPostByIdQuery } from '../../app/apiSlice'
 import { useAppSelector } from '../../app/withTypes'
 import { Spinner } from '../../components/Spinner'
 import { selectCurrentUserId } from '../auth/authSlice'
 import { PostMetaData } from './PostMetaData'
 import { ReactionButtons } from './ReactionButtons'
+import { useGetPostByIdQuery } from './postsApiSlice'
 
 export function SinglePostPage() {
   const { postId } = useParams()

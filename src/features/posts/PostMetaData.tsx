@@ -8,7 +8,8 @@ interface PostMeatDataProps {
 }
 
 export function PostMetaData({ postId }: PostMeatDataProps) {
-  const post = useAppSelector((state) => selectPostById(state, postId))
+  const post = useAppSelector((state) => selectPostById(state, postId!))
+  console.log({ post })
   return (
     <p>
       <PostAuthor userId={post?.user} />

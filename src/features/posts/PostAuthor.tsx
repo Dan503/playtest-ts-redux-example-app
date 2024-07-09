@@ -2,11 +2,11 @@ import { useAppSelector } from '../../app/withTypes'
 import { selectUserById } from '../users/usersSlice'
 
 interface PostAuthorProps {
-  userId?: string
+  userId: string | null | undefined
 }
 
 export function PostAuthor({ userId }: PostAuthorProps) {
-  const author = useAppSelector((state) => selectUserById(state, userId))
+  const authorName = useAppSelector((state) => (userId ? selectUserById(state, userId).name : 'Unknown author'))
 
-  return <span>by {author?.name ?? 'Unknown author'}</span>
+  return <span>by {authorName}</span>
 }

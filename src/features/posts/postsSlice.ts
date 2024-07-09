@@ -1,11 +1,7 @@
-import { PayloadAction, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
-import { EntityStateWithLoading } from '../../api/api.types'
-import { client } from '../../api/client'
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { startAppListening } from '../../app/listenerMiddleware'
 import { AppRootState } from '../../app/store'
-import { createAppAsyncThunk, initialLoadingState } from '../../app/withTypes'
-import { logout } from '../auth/authSlice'
-import { apiSlice } from '../../app/apiSlice'
+import { postsAdapter, postsApiSlice, PostUpdate } from './postsApiSlice'
 
 // Define a TS type for the data we'll be using
 export interface Reactions {
@@ -18,8 +14,6 @@ export interface Reactions {
 
 export type ReactionName = keyof Reactions
 
-type PostsState = EntityStateWithLoading<Post>
-
 export interface Post {
   id: string
   title: string
@@ -29,43 +23,7 @@ export interface Post {
   reactions: Reactions
 }
 
-export type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
-export type PostAddNew = Pick<Post, 'title' | 'content' | 'user'>
-
-const postsAdapter = createEntityAdapter<Post>({
-  // Sort in descending date order
-  sortComparer: (a, b) => b.date.localeCompare(a.date),
-})
-
-const initialState: PostsState = postsAdapter.getInitialState(initialLoadingState)
-
-export const fetchPosts = createAppAsyncThunk(
-  'posts/fetchPosts',
-  async () => {
-    const response = await client.get<Array<Post>>('/fakeApi/posts')
-    return response.data
-  },
-  {
-    condition(_arg, thunkApi) {
-      const { posts } = thunkApi.getState()
-      if (posts.status === 'idle') {
-        return true
-      }
-      return false
-    },
-  },
-)
-
-export const addNewPost = createAppAsyncThunk<Post, PostAddNew>(
-  'posts/addNewPost',
-  // The payload creator receives the partial `{title, content, user}` object
-  async (initialPost) => {
-    // We send the initial data to the fake API server
-    const response = await client.post<Post>('/fakeApi/posts', initialPost)
-    // The response includes the complete post object, including unique ID
-    return response.data
-  },
-)
+const initialState = postsAdapter.getInitialState()
 
 const postSlice = createSlice({
   name: 'posts',
@@ -87,30 +45,11 @@ const postSlice = createSlice({
       }
     },
   },
-  extraReducers(builder) {
-    builder
-      .addCase(logout.fulfilled, (_state) => {
-        // Clear out the list of posts whenever the user logs out
-        return initialState
-      })
-      .addCase(fetchPosts.pending, (state) => {
-        state.status = 'loading'
-      })
-      .addCase(fetchPosts.fulfilled, (state, action) => {
-        state.status = 'success'
-        postsAdapter.setAll(state, action.payload)
-      })
-      .addCase(fetchPosts.rejected, (state, action) => {
-        state.status = 'fail'
-        state.error = action.error.message ?? 'Unknown Error'
-      })
-      .addCase(addNewPost.fulfilled, postsAdapter.addOne)
-  },
 })
 
 export function addPostListeners() {
   startAppListening({
-    matcher: apiSlice.endpoints.addNewPost.matchFulfilled,
+    matcher: postsApiSlice.endpoints.addNewPost.matchFulfilled,
     effect: async (_action, listenerApi) => {
       const { toast } = await import('react-tiny-toast')
 
@@ -132,12 +71,14 @@ export const { postUpdated, reactionAdded } = postSlice.actions
 // Export the generated reducer function
 export const postReducer = postSlice.reducer
 
-// == SELECTORS ==
-export const {
-  selectAll: selectAllPosts,
-  selectById: selectPostById,
-  selectIds: selectAllPostIds,
-} = postsAdapter.getSelectors<AppRootState>((state) => state.posts)
+// = SELECTORS = //
+
+const selectPostsResult = postsApiSlice.endpoints.getPosts.select()
+const selectPostsData = createSelector(selectPostsResult, (result) => result.data ?? initialState)
+
+export const { selectAll: selectAllPosts, selectById: selectPostById } = postsAdapter.getSelectors<AppRootState>(
+  (state) => selectPostsData(state),
+)
 
 export const selectPostByUserId = createSelector(
   // Pass in one or more "input selectors"

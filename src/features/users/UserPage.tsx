@@ -3,17 +3,17 @@ import { useAppSelector } from '../../app/withTypes'
 import { selectUserById } from './usersSlice'
 import { Post } from '../posts/postsSlice'
 import { TypedUseQueryStateResult } from '@reduxjs/toolkit/query/react'
-import { createSelector } from '@reduxjs/toolkit'
-import { useGetPostsQuery } from '../../app/apiSlice'
+import { createSelector, EntityState } from '@reduxjs/toolkit'
+import { useGetPostsQuery } from '../posts/postsApiSlice'
 
 // Create a TS type that represents:
 // "the result value passed into the `selectFromResult` function for this hook"
-type GetPostSelectFromResultArg = TypedUseQueryStateResult<Array<Post>, any, any>
+type GetPostSelectFromResultArg = TypedUseQueryStateResult<EntityState<Post, string>, any, any>
 
 const selectPostsByUser = createSelector(
   (res: GetPostSelectFromResultArg) => res.data,
   (_res: GetPostSelectFromResultArg, userId: string) => userId,
-  (data, userId) => data?.filter((post) => post.user === userId),
+  (data, userId) => Object.values(data || {}).filter((post) => post.user === userId),
 )
 
 export function UserPage() {

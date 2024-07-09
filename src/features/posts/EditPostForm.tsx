@@ -1,6 +1,6 @@
 import { FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useEditPostMutation, useGetPostByIdQuery } from '../../app/apiSlice'
+import { useEditPostMutation, useGetPostByIdQuery } from './postsApiSlice'
 
 interface EditPostFormFields extends HTMLFormControlsCollection {
   postTitle: HTMLInputElement
