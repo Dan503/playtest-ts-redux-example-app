@@ -79,7 +79,8 @@ export const selectNotificationsResult = notificationApiSlice.endpoints.getNotif
 export const selectNotificationsData = createSelector(selectNotificationsResult, (result) => result.data ?? [])
 
 export const fetchNotificationsWebsocket = (): AppThunk => (_dispatch, getState) => {
-  const allNotifications = selectNotificationsData(getState())
+  const state = getState()
+  const allNotifications = selectNotificationsData(state)
   const [latestNotification] = allNotifications
   const latestTimeStamp = latestNotification?.date ?? ''
   // Hardcode a call to the mock server to simulate a server push scenario over websockets
@@ -107,7 +108,7 @@ const notificationSlice = createSlice({
   },
   extraReducers(builder) {
     builder.addMatcher(matchNotificationsReceived, (state, action) => {
-      const notificationMetadata: Array<NotificationMetaData> = action.payload.map((n) => ({
+      const notificationMetadata: Array<NotificationMetaData> = action.payload?.map((n) => ({
         id: n.id,
         isRead: false,
         isNew: true,
