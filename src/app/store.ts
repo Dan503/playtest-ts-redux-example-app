@@ -1,6 +1,5 @@
 import { Action, ThunkAction, configureStore } from '@reduxjs/toolkit'
 import { authReducer } from '../features/auth/authSlice'
-import { notificationReducer } from '../features/notifications/notificationsSlice'
 import { postReducer } from '../features/posts/postsSlice'
 import { usersReducer } from '../features/users/usersSlice'
 import { listenerMiddleware } from './listenerMiddleware'
@@ -13,7 +12,7 @@ export const store = configureStore({
     posts: postReducer,
     users: usersReducer,
     auth: authReducer,
-    notifications: notificationReducer,
+    // notifications: notificationReducer,
   },
   middleware: (getDefaultMiddleWare) => {
     return getDefaultMiddleWare().prepend(listenerMiddleware.middleware).concat(apiSlice.middleware)

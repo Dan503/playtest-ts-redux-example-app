@@ -11,7 +11,6 @@ import { useAppSelector } from './app/withTypes'
 import { selectCurrentUserId } from './features/auth/authSlice'
 import { UsersList } from './features/users/UsersList'
 import { UserPage } from './features/users/UserPage'
-import { NotificationsList } from './features/notifications/NotificationsList'
 import { ToastContainer } from 'react-tiny-toast'
 
 interface ProtectedRouteProps {
@@ -50,7 +49,7 @@ function App() {
                   />
                   <Route path="/posts/:postId" Component={SinglePostPage} />
                   <Route path="/editPost/:postId" Component={EditPostForm} />
-                  <Route path="/notifications" Component={NotificationsList} />
+                  {/* <Route path="/notifications" Component={NotificationsList} /> */}
                   <Route path="/users" Component={UsersList} />
                   <Route path="/users/:userId" Component={UserPage} />
                 </Routes>
