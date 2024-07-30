@@ -1,4 +1,11 @@
-import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
+import {
+  createAction,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  isAnyOf,
+  PayloadAction,
+} from '@reduxjs/toolkit'
 import { forceGenerateNotifications } from '../../api/server'
 import { apiSlice } from '../../app/apiSlice'
 import { AppRootState, AppThunk } from '../../app/store'
@@ -29,6 +36,52 @@ const metadataAdapter = createEntityAdapter<NotificationMetadata>()
 
 const initialState = metadataAdapter.getInitialState()
 
+const notificationsReceived = createAction<Array<ServerNotification>>('notifications/notificationsReceived')
+
+export const notificationsApiSlice = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    getNotifications: builder.query<Array<ServerNotification>, void>({
+      query: () => '/notifications',
+      async onCacheEntryAdded(arg, lifecycleApi) {
+        // create a websocket connection when the cache subscription starts
+        const ws = new WebSocket('ws://localhost')
+        try {
+          // wait for the initial query to resolve before proceeding
+          await lifecycleApi.cacheDataLoaded
+
+          // when data is received from the socket connection to the server,
+          // update our query result with the received message
+          function listener(event: MessageEvent<string>) {
+            const message: PayloadAction<Array<ServerNotification>> = JSON.parse(event.data)
+            if (message.type === 'notifications') {
+              lifecycleApi.updateCachedData((draft) => {
+                // Insert all received notifications from the websocket
+                // into the existing RTKQ cache array
+                draft.push(...message.payload)
+                draft.sort((a, b) => b.date.localeCompare(a.date))
+              })
+            }
+          }
+
+          ws.addEventListener('message', listener)
+        } catch {
+          // no-op in case `cacheEntryRemoved` resolves before `cacheDataLoaded`,
+          // in which case `cacheDataLoaded` will throw
+        }
+        // cacheEntryRemoved will resolve when the cache subscription is no longer active
+        await lifecycleApi.cacheEntryRemoved
+        // perform cleanup steps once the `cacheEntryRemoved` promise resolves
+        ws.close()
+      },
+    }),
+  }),
+})
+
+const matchNotificationsReceived = isAnyOf(
+  notificationsReceived,
+  notificationsApiSlice.endpoints.getNotifications.matchFulfilled,
+)
+
 const notificationsSlice = createSlice({
   name: 'notifications',
   initialState,
@@ -40,7 +93,7 @@ const notificationsSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addMatcher(notificationsApiSlice.endpoints.getNotifications.matchFulfilled, (state, action) => {
+    builder.addMatcher(matchNotificationsReceived, (state, action) => {
       const notificationsWithMetadata: Array<NotificationMetadata> = action.payload.map((notification) => ({
         id: notification.id,
         isNew: true,
@@ -55,14 +108,6 @@ const notificationsSlice = createSlice({
       metadataAdapter.upsertMany(state, notificationsWithMetadata)
     })
   },
-})
-
-export const notificationsApiSlice = apiSlice.injectEndpoints({
-  endpoints: (builder) => ({
-    getNotifications: builder.query<Array<ServerNotification>, void>({
-      query: () => '/notifications',
-    }),
-  }),
 })
 
 export const { useGetNotificationsQuery } = notificationsApiSlice

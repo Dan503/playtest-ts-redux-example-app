@@ -7,12 +7,15 @@ import { UserIcon } from './UserIcon'
 import {
   fetchNotificationsWebSocket,
   selectUnreadNotificationsCount,
+  useGetNotificationsQuery,
 } from '../features/notifications/notificationsSlice'
 
 export const Navbar = () => {
   const dispatch = useAppDispatch()
   const currentUser = useAppSelector(selectCurrentUser)
   const numUnreadNotifications = useAppSelector(selectUnreadNotificationsCount)
+
+  useGetNotificationsQuery()
 
   let navContent: ReactNode = null
 
