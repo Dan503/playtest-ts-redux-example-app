@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../app/withTypes'
 import { logout } from '../features/auth/authSlice'
 import { selectCurrentUser } from '../features/users/usersSlice'
 import { UserIcon } from './UserIcon'
+import { fetchNotifications } from '../features/notifications/notificationsSlice'
 
 export const Navbar = () => {
   const dispatch = useAppDispatch()
@@ -18,11 +19,19 @@ export const Navbar = () => {
       await dispatch(logout())
     }
 
+    function fetchNewNotifications() {
+      dispatch(fetchNotifications())
+    }
+
     navContent = (
       <div className="navContent">
         <div className="navLinks">
           <Link to="/posts">Post</Link>
           <Link to="/users">Users</Link>
+          <Link to="/notifications">Notifications</Link>
+          <button className="button small" onClick={fetchNewNotifications}>
+            Refresh Notifications
+          </button>
         </div>
         <div className="userDetails">
           <UserIcon size={32} />
