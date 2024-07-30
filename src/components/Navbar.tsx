@@ -4,7 +4,10 @@ import { useAppDispatch, useAppSelector } from '../app/withTypes'
 import { logout } from '../features/auth/authSlice'
 import { selectCurrentUser } from '../features/users/usersSlice'
 import { UserIcon } from './UserIcon'
-import { fetchNotifications, selectUnreadNotificationsCount } from '../features/notifications/notificationsSlice'
+import {
+  fetchNotificationsWebSocket,
+  selectUnreadNotificationsCount,
+} from '../features/notifications/notificationsSlice'
 
 export const Navbar = () => {
   const dispatch = useAppDispatch()
@@ -21,7 +24,7 @@ export const Navbar = () => {
     }
 
     function fetchNewNotifications() {
-      dispatch(fetchNotifications())
+      dispatch(fetchNotificationsWebSocket())
     }
 
     const unreadNotificationsBadge =

@@ -1,9 +1,7 @@
-import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
-import { client } from '../../api/client'
-import { AppRootState } from '../../app/store'
-import { createAppAsyncThunk } from '../../app/withTypes'
-import { RootState } from '@reduxjs/toolkit/query'
+import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
+import { forceGenerateNotifications } from '../../api/server'
 import { apiSlice } from '../../app/apiSlice'
+import { AppRootState, AppThunk } from '../../app/store'
 
 export interface ServerNotification {
   id: string
@@ -18,10 +16,14 @@ export interface NotificationMetadata {
   isNew: boolean
 }
 
-export const fetchNotifications = createAppAsyncThunk('notifications/fetchNotifications', async (_unused, thunkApi) => {
-  const response = await client.get<Array<ServerNotification>>(`/fakeApi/notifications`)
-  return response.data
-})
+export function fetchNotificationsWebSocket(): AppThunk {
+  return (_dispatch, getState) => {
+    const allNotifications = selectNotificationsData(getState())
+    const [latestNotification] = allNotifications
+    const latestTimestamp = latestNotification?.date ?? ''
+    forceGenerateNotifications(latestTimestamp)
+  }
+}
 
 const metadataAdapter = createEntityAdapter<NotificationMetadata>()
 
@@ -77,3 +79,10 @@ export function selectUnreadNotificationsCount(state: AppRootState) {
   const unreadNotifications = allNotifications.filter((notification) => !notification.isRead)
   return unreadNotifications.length
 }
+
+export const selectNotificationsResult = notificationsApiSlice.endpoints.getNotifications.select()
+
+const selectNotificationsData = createSelector(
+  selectNotificationsResult,
+  (notificationsResult) => notificationsResult.data ?? [],
+)
