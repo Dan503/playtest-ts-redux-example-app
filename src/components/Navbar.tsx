@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../app/withTypes'
 import { logout } from '../features/auth/authSlice'
 import { selectCurrentUser } from '../features/users/usersSlice'
 import { UserIcon } from './UserIcon'
-import { fetchNotifications } from '../features/notifications/notificationsSlice'
+import { fetchNotifications, selectUnreadNotificationsCount } from '../features/notifications/notificationsSlice'
 
 export const Navbar = () => {
   const dispatch = useAppDispatch()
@@ -23,12 +23,17 @@ export const Navbar = () => {
       dispatch(fetchNotifications())
     }
 
+    const numUnreadNotifications = useAppSelector(selectUnreadNotificationsCount)
+
+    const unreadNotificationsBadge =
+      numUnreadNotifications > 0 ? <span className="badge">{numUnreadNotifications}</span> : null
+
     navContent = (
       <div className="navContent">
         <div className="navLinks">
           <Link to="/posts">Post</Link>
           <Link to="/users">Users</Link>
-          <Link to="/notifications">Notifications</Link>
+          <Link to="/notifications">Notifications {unreadNotificationsBadge}</Link>
           <button className="button small" onClick={fetchNewNotifications}>
             Refresh Notifications
           </button>
