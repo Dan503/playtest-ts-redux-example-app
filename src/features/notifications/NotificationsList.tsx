@@ -2,12 +2,13 @@ import { useLayoutEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/withTypes'
 import { PostAuthor } from '../posts/PostAuthor'
 import { TimeAgo } from '../posts/TimeAgo'
-import { allNotificationsRead, selectAllNotifications } from './notificationsSlice'
+import { allNotificationsRead, selectAllNotifications, useGetNotificationsQuery } from './notificationsSlice'
 import classNames from 'classnames'
 
 export function NotificationsList() {
-  const notifications = useAppSelector(selectAllNotifications)
+  //   const notifications = useAppSelector(selectAllNotifications)
   const dispatch = useAppDispatch()
+  const { data: notifications = [] } = useGetNotificationsQuery()
 
   useLayoutEffect(() => {
     dispatch(allNotificationsRead())
@@ -17,7 +18,9 @@ export function NotificationsList() {
     <section className="notificationsList">
       <h2>Notifications</h2>
       {notifications.map((notification) => {
-        const notificationClassName = classNames('notification', { new: notification.isNew })
+        const notificationClassName = classNames('notification', {
+          // new: notification.isNew
+        })
         return (
           <div key={notification.id} className={notificationClassName}>
             <div>

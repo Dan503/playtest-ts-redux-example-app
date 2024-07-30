@@ -3,6 +3,7 @@ import { client } from '../../api/client'
 import { AppRootState } from '../../app/store'
 import { createAppAsyncThunk } from '../../app/withTypes'
 import { RootState } from '@reduxjs/toolkit/query'
+import { apiSlice } from '../../app/apiSlice'
 
 export interface ServerNotification {
   id: string
@@ -55,6 +56,16 @@ const notificationsSlice = createSlice({
     })
   },
 })
+
+export const notificationsApiSlice = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    getNotifications: builder.query<Array<ServerNotification>, void>({
+      query: () => '/notifications',
+    }),
+  }),
+})
+
+export const { useGetNotificationsQuery } = notificationsApiSlice
 
 export const { allNotificationsRead } = notificationsSlice.actions
 

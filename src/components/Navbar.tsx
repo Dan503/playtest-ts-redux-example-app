@@ -9,6 +9,7 @@ import { fetchNotifications, selectUnreadNotificationsCount } from '../features/
 export const Navbar = () => {
   const dispatch = useAppDispatch()
   const currentUser = useAppSelector(selectCurrentUser)
+  const numUnreadNotifications = useAppSelector(selectUnreadNotificationsCount)
 
   let navContent: ReactNode = null
 
@@ -22,8 +23,6 @@ export const Navbar = () => {
     function fetchNewNotifications() {
       dispatch(fetchNotifications())
     }
-
-    const numUnreadNotifications = useAppSelector(selectUnreadNotificationsCount)
 
     const unreadNotificationsBadge =
       numUnreadNotifications > 0 ? <span className="badge">{numUnreadNotifications}</span> : null
