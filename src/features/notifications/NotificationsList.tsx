@@ -2,11 +2,11 @@ import { useLayoutEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/withTypes'
 import { PostAuthor } from '../posts/PostAuthor'
 import { TimeAgo } from '../posts/TimeAgo'
-import { allNotificationsRead, selectAllNotifications, useGetNotificationsQuery } from './notificationsSlice'
+import { allNotificationsRead, selectMetadataEntities, useGetNotificationsQuery } from './notificationsSlice'
 import classNames from 'classnames'
 
 export function NotificationsList() {
-  //   const notifications = useAppSelector(selectAllNotifications)
+  const notificationMetaData = useAppSelector(selectMetadataEntities)
   const dispatch = useAppDispatch()
   const { data: notifications = [] } = useGetNotificationsQuery()
 
@@ -18,8 +18,10 @@ export function NotificationsList() {
     <section className="notificationsList">
       <h2>Notifications</h2>
       {notifications.map((notification) => {
+        // Get the metadata object matching this notification
+        const metadata = notificationMetaData[notification.id]
         const notificationClassName = classNames('notification', {
-          // new: notification.isNew
+          new: metadata.isNew,
         })
         return (
           <div key={notification.id} className={notificationClassName}>
