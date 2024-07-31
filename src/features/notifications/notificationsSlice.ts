@@ -60,6 +60,9 @@ export const notificationsApiSlice = apiSlice.injectEndpoints({
                 draft.push(...message.payload)
                 draft.sort((a, b) => b.date.localeCompare(a.date))
               })
+
+              // Dispatch an additional action so that we can track the "isRead" state
+              lifecycleApi.dispatch(notificationsReceived(message.payload))
             }
           }
 
