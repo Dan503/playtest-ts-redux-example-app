@@ -11,9 +11,9 @@ const initialState: Auth = {
   currentUserId: null,
 }
 
-export const login = createAppAsyncThunk('auth/login', async (userName: string) => {
-  await client.post('/fakeApi/login', { userName })
-  return userName
+export const login = createAppAsyncThunk('auth/login', async (username: string) => {
+  await client.post('/fakeApi/login', { username })
+  return username
 })
 
 export const logout = createAppAsyncThunk('auth/logout', async () => {
